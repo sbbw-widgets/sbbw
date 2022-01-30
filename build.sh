@@ -8,12 +8,12 @@ fi
 
 # Verify if cargo is installed
 if ! command -v cargo >/dev/null 2>&1; then
-  echo "Cargo is not installed"
+  echo "Cargo or Rust is not installed"
   exit 1
 fi
 
 # install dependencies with cargo in sbbw-daemon
-cd ./sbbw-daemon && cargo build --release
+cargo build --release
 
 # install dependencies with yarn in sbbw-window
 cd sbbw-window && yarn tauri build
