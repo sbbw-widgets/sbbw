@@ -65,9 +65,9 @@ async fn main() {
         .get_matches();
 
     if matches.is_present("show-windows") {
-        println!("Installed widgets:");
+        println!("{}", "Installed widgets:".blue().bold());
         for widget in widgets {
-            println!("- {}", widget);
+            println!("{} {}", "-".blue(), widget);
         }
         return;
     }
@@ -82,7 +82,7 @@ async fn main() {
             command.push_str("open");
             value_command.push_str(value);
         } else {
-            println!("Widget {} not found", value);
+            println!("{}", "Widget {} not found".red().replace("{}", &value.yellow().bold()));
             return;
         }
     }
@@ -92,7 +92,7 @@ async fn main() {
             command.push_str("close");
             value_command.push_str(value);
         } else {
-            println!("Widget {} not found", value);
+            println!("{}", "Widget {} not found".red().replace("{}", &value.yellow().bold()));
             return;
         }
     }
@@ -102,15 +102,15 @@ async fn main() {
             let path_conf = get_widgets_path().join(value).join("config.toml");
             if path_conf.exists() {
                 if validate_config_toml(path_conf).is_err() {
-                    println!("Config of widget {} is not valid", value);
+                    println!("{}", "Config of widget {} is not valid".red().replace("{}", &value.yellow().bold()));
                     return;
                 } else {
-                    println!("Config of widget {} is valid", value);
+                    println!("{}", "Config of widget {} is valid".green().replace("{}", &value.yellow().bold()));
                     return;
                 }
             }
         }
-        println!("Widget {} not found", value);
+        println!("{}", "Widget {} not found".red().replace("{}", &value.yellow().bold()));
         return;
     }
 
@@ -131,7 +131,7 @@ async fn main() {
                 println!("Close: {:?}", data);
             }
             _ => {
-                panic!("Unknown command");
+                panic!("{}", "Unknown command".red().bold());
             }
         },
         _ => {}

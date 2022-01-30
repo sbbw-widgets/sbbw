@@ -17,8 +17,14 @@ pub fn get_widgets() -> Vec<String> {
     paths.filter_map(|path| {
         let path = path.unwrap().path();
         if path.is_dir() {
-            let dir_name = path.file_name().unwrap().to_str().unwrap();
-            Some(dir_name.to_string())
+            // if config file exist on folder
+            let mut config_path = path.clone();
+            config_path.push("config.toml");
+            if config_path.exists() {
+                Some(path.file_name().unwrap().to_str().unwrap().to_string())
+            } else {
+                None
+            }
         } else {
             None
         }

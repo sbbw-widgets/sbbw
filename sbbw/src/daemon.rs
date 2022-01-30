@@ -1,4 +1,4 @@
-use colored::*;
+use colored::Colorize;
 use serde::Serialize;
 use std::{
     io::{Read, Write},
@@ -85,11 +85,7 @@ impl Daemon {
                 true
             }
             Err(e) => {
-                println!("Error: {}", e);
-                println!(
-                    "An error occurred, terminating connection with {}",
-                    stream.peer_addr().unwrap()
-                );
+                println!("[{}] {}", "Error".red().bold(), e);
                 stream.shutdown(Shutdown::Both).unwrap();
                 false
             }
@@ -100,7 +96,7 @@ impl Daemon {
         let addr = self.socket_addr.clone();
         let listener = TcpListener::bind(addr).unwrap();
         // accept connections and process them, spawning a new thread for each one
-        println!("Daemon server mode running");
+        println!("{}", "Daemon running".blue());
         for stream in listener.incoming() {
             match stream {
                 Ok(mut stream) => {
@@ -108,8 +104,7 @@ impl Daemon {
                     self.handle_client(&mut stream).await
                 }
                 Err(e) => {
-                    println!("Error: {}", e);
-                    /* Start server failed */
+                    println!("[{}] {}", "Error".red().bold(), e);
                 }
             }
         }
@@ -121,16 +116,15 @@ impl Daemon {
         let addr = self.socket_addr.clone();
         match TcpStream::connect(&addr) {
             Ok(stream) => {
-                println!("Successfully connected to daemon");
+                println!("{}", "Successfully connected to daemon".green().bold());
                 self.make_client(stream);
             }
             Err(_e) => {
                 // create new conection
-                println!("Creating new daemon");
+                println!("{}", "Creating new daemon".blue().bold());
                 self.make_server().await;
             }
         }
-        println!("Terminated.");
     }
 
     pub fn send_command(&self, client_stream: Option<TcpStream>, command: String, data: String) {
@@ -142,7 +136,7 @@ impl Daemon {
                 stream.shutdown(Shutdown::Both).unwrap();
             }
             None => {
-                println!("The main daemon is not running");
+                println!("{}", "The main daemon is not running".green().bold());
             }
         }
     }
