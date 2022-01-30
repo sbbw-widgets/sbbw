@@ -1,8 +1,12 @@
+#![feature(proc_macro_hygiene, decl_macro)]
 use clap::{App, Arg};
 use colored::*;
 use daemon::{Daemon, TransferData};
+use rocket::response::{NamedFile, status::NotFound};
 use sbbw_widget_conf::validate_config_toml;
-use std::{net::IpAddr, rc::Rc};
+use std::{net::IpAddr, rc::Rc, path::PathBuf};
+
+#[macro_use] extern crate rocket;
 
 use utils::get_widgets;
 
@@ -14,6 +18,12 @@ mod utils;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
+
+#[get("/<file..>")]
+fn load_widget(file: PathBuf) -> Result<NamedFile, NotFound<String>> {
+    let path = get_widgets_path().join(file);
+    NamedFile::open(&path).map_err(|e| NotFound(e.to_string()))
+}
 
 #[tokio::main]
 async fn main() {
@@ -82,7 +92,12 @@ async fn main() {
             command.push_str("open");
             value_command.push_str(value);
         } else {
-            println!("{}", "Widget {} not found".red().replace("{}", &value.yellow().bold()));
+            println!(
+                "{}",
+                "Widget {} not found"
+                    .red()
+                    .replace("{}", &value.yellow().bold())
+            );
             return;
         }
     }
@@ -92,7 +107,12 @@ async fn main() {
             command.push_str("close");
             value_command.push_str(value);
         } else {
-            println!("{}", "Widget {} not found".red().replace("{}", &value.yellow().bold()));
+            println!(
+                "{}",
+                "Widget {} not found"
+                    .red()
+                    .replace("{}", &value.yellow().bold())
+            );
             return;
         }
     }
@@ -102,15 +122,30 @@ async fn main() {
             let path_conf = get_widgets_path().join(value).join("config.toml");
             if path_conf.exists() {
                 if validate_config_toml(path_conf).is_err() {
-                    println!("{}", "Config of widget {} is not valid".red().replace("{}", &value.yellow().bold()));
+                    println!(
+                        "{}",
+                        "Config of widget {} is not valid"
+                            .red()
+                            .replace("{}", &value.yellow().bold())
+                    );
                     return;
                 } else {
-                    println!("{}", "Config of widget {} is valid".green().replace("{}", &value.yellow().bold()));
+                    println!(
+                        "{}",
+                        "Config of widget {} is valid"
+                            .green()
+                            .replace("{}", &value.yellow().bold())
+                    );
                     return;
                 }
             }
         }
-        println!("{}", "Widget {} not found".red().replace("{}", &value.yellow().bold()));
+        println!(
+            "{}",
+            "Widget {} not found"
+                .red()
+                .replace("{}", &value.yellow().bold())
+        );
         return;
     }
 
@@ -138,5 +173,6 @@ async fn main() {
     });
     daemon.set_callbacks(receiver_data_callback);
 
+    tokio::spawn(async { rocket::ignite().mount("/", routes![load_widget]).launch() });
     tokio::join!(async move { daemon.run().await });
 }
