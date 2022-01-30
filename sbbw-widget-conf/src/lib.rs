@@ -1,16 +1,29 @@
+#[allow(unused_imports)]
+use colored::*;
+use serde::{
+    de::{self, Deserializer},
+    Deserialize, Serialize, Serializer,
+};
 use std::path::PathBuf;
 
-use serde::{de::Deserializer, Deserialize, Serialize, Serializer};
-
-fn deserialize_with<'de, D>(de: D) -> Result<WidgetSize, D::Error>
+fn deserialize_widget_size<'de, D>(de: D) -> Result<WidgetSize, D::Error>
 where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(de)?;
     match s.to_ascii_lowercase().as_str() {
         "max" => Ok(WidgetSize::Max),
-        _ => Ok(WidgetSize::Value(s.parse::<f32>().unwrap())),
-        // _ => Err(serde::de::Error::custom("error trying to deserialize rotation policy config"))
+        _ => {
+            let v = s.parse::<f32>();
+            if v.is_err() {
+                return Err(de::Error::custom(format!(
+                    "[{}] Invalid widget size (Cannot convert into f32): {}",
+                    "Error".red().bold(),
+                    s
+                )));
+            }
+            Ok(WidgetSize::Value(v.unwrap()))
+        } // _ => Err(serde::de::Error::custom("error trying to deserialize rotation policy config"))
     }
 }
 
@@ -44,9 +57,9 @@ impl Default for WidgetSize {
 pub struct WidgetConfig {
     pub name: String,
     pub class_name: String, // TODO: add support
-    #[serde(deserialize_with = "deserialize_with")]
+    #[serde(deserialize_with = "deserialize_widget_size")]
     pub width: WidgetSize,
-    #[serde(deserialize_with = "deserialize_with")]
+    #[serde(deserialize_with = "deserialize_widget_size")]
     pub height: WidgetSize,
     pub x: f32,
     pub y: f32,
@@ -115,18 +128,23 @@ impl WidgetConfig {
 fn validate_config_from_string(config: &str) -> Result<WidgetConfig, String> {
     match toml::from_str::<'_, WidgetConfig>(&config) {
         Ok(conf) => Ok(conf),
-        Err(e) => Err(format!("Config file is not valid: {}", e)),
+        Err(e) => Err(format!(
+            "[{}] Config file is not valid: {}",
+            "Error".red().bold(),
+            e
+        )),
     }
 }
 pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> {
     if !conf_path.exists() {
         return Err(format!(
-            "Config file for window not found: {}",
+            "[{}] Config file for window not found: {}",
+            "Error".red().bold(),
             conf_path.display()
         ));
     }
     let conf_str = std::fs::read_to_string(conf_path).unwrap();
-    validate_config_from_string(&conf_str)
+    validate_config_from_string(&conf_str.as_str())
 }
 
 #[cfg(test)]

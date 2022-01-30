@@ -11,4 +11,5 @@ lto = true
 
 [dependencies]
 toml = "0.5"
+colored = "2.0.0"
 serde = { version = "1.0", features = ["derive"] }
