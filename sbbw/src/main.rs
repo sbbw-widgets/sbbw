@@ -1,8 +1,12 @@
 use clap::{App, Arg};
+use colored::*;
 use daemon::{Daemon, TransferData};
+use sbbw_widget_conf::validate_config_toml;
 use std::{net::IpAddr, rc::Rc};
 
 use utils::get_widgets;
+
+use crate::utils::get_widgets_path;
 
 mod daemon;
 mod utils;
@@ -22,13 +26,13 @@ async fn main() {
         .version(VERSION)
         .author(AUTHORS)
         .args(&[
-            Arg::new("ip")
-                .short('i')
-                .long("ip")
-                .value_name("IP")
-                .help("IP address to listen on")
-                .takes_value(true)
-                .default_value("0.0.0.0"),
+            // Arg::new("ip")
+            //     .short('i')
+            //     .long("ip")
+            //     .value_name("IP")
+            //     .help("IP address to listen on")
+            //     .takes_value(true)
+            //     .default_value("0.0.0.0"),
             Arg::new("port")
                 .short('p')
                 .long("port")
@@ -41,13 +45,18 @@ async fn main() {
                 .long("open")
                 .help("Open the widget")
                 .takes_value(true)
-                .value_names(&widgets),
+                .possible_values(&widgets),
             Arg::new("close")
                 .short('c')
                 .long("close")
                 .help("Close the widget")
                 .takes_value(true)
-                .value_names(&widgets),
+                .possible_values(&widgets),
+            Arg::new("check-config")
+                .long("check-config")
+                .help("Check config of the widget")
+                .takes_value(true)
+                .possible_values(&widgets),
             Arg::new("show-windows")
                 .long("show-windows")
                 .help("Show all widgets installeds")
@@ -63,14 +72,56 @@ async fn main() {
         return;
     }
 
-    let ip = matches.value_of("ip").unwrap().parse::<IpAddr>().unwrap();
+    let mut command = String::new();
+    let mut value_command = String::new();
+
+    println!("{}", "Sbbw Daemon".green());
+
+    if let Some(value) = matches.value_of("open") {
+        if widgets.contains(&value) {
+            command.push_str("open");
+            value_command.push_str(value);
+        } else {
+            println!("Widget {} not found", value);
+            return;
+        }
+    }
+
+    if let Some(value) = matches.value_of("close") {
+        if widgets.contains(&value) {
+            command.push_str("close");
+            value_command.push_str(value);
+        } else {
+            println!("Widget {} not found", value);
+            return;
+        }
+    }
+
+    if let Some(value) = matches.value_of("check-config") {
+        if widgets.contains(&value) {
+            let path_conf = get_widgets_path().join(value).join("config.toml");
+            if path_conf.exists() {
+                if validate_config_toml(path_conf).is_err() {
+                    println!("Config of widget {} is not valid", value);
+                    return;
+                } else {
+                    println!("Config of widget {} is valid", value);
+                    return;
+                }
+            }
+        }
+        println!("Widget {} not found", value);
+        return;
+    }
+
+    let ip = "0.0.0.0".parse::<IpAddr>().unwrap();
     let port: u16 = matches.value_of("port").unwrap().parse::<u16>().unwrap();
 
     let mut daemon = Daemon::new(ip, port);
-    // daemon.set_command(
-    //     "open".to_string(),
-    //     matches.value_of("open").unwrap().to_string(),
-    // );
+    if command.len() > 0 && value_command.len() > 0 {
+        daemon.set_command(command, value_command);
+    }
+
     let receiver_data_callback = Rc::new(move |response: TransferData| match response {
         TransferData::Get((command, data)) => match command.as_str() {
             "open" => {

@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "sbbw",
+    "sbbw-widget-conf",
+#    "sbbw-widget/src-tauri"
+]
+
+[profile.release]
+opt-level = "z" # Optimize for size.
+strip = true    # Automatically strip symbols from the binary.
+lto = true

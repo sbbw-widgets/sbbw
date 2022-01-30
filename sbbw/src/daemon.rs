@@ -1,9 +1,10 @@
+use colored::*;
+use serde::Serialize;
 use std::{
     io::{Read, Write},
-    net::{IpAddr, Shutdown, SocketAddr, TcpListener, TcpStream}, rc::Rc,
+    net::{IpAddr, Shutdown, SocketAddr, TcpListener, TcpStream},
+    rc::Rc,
 };
-
-use serde::Serialize;
 
 type TransferDataFunc = dyn Fn(TransferData);
 
