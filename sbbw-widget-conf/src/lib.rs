@@ -113,14 +113,12 @@ impl WidgetConfig {
 }
 
 fn validate_config_from_string(config: &str) -> Result<WidgetConfig, String> {
-    write_config_toml();
     match toml::from_str::<'_, WidgetConfig>(&config) {
         Ok(conf) => Ok(conf),
         Err(e) => Err(format!("Config file is not valid: {}", e)),
     }
 }
 pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> {
-    write_config_toml();
     if !conf_path.exists() {
         return Err(format!(
             "Config file for window not found: {}",
@@ -129,20 +127,6 @@ pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> 
     }
     let conf_str = std::fs::read_to_string(conf_path).unwrap();
     validate_config_from_string(&conf_str)
-}
-fn write_config_toml() {
-    let conf_path = PathBuf::from("/tmp/test_config.toml");
-    let mut conf = WidgetConfig::new("Test".to_string());
-    conf.set_class_name("Test_Class".to_string());
-    conf.set_size(WidgetSize::Value(200.0), WidgetSize::Max);
-    conf.set_position(0.0, 0.0);
-    conf.set_transparent(true);
-    conf.set_blur(true);
-    conf.set_allways_on_top(true);
-
-    // save on /tmp/test_config.toml file
-    let conf_str = toml::to_string(&conf).unwrap();
-    std::fs::write(conf_path, conf_str).unwrap();
 }
 
 #[cfg(test)]
