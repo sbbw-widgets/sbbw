@@ -3,17 +3,12 @@ use clap::{App, Arg};
 use colored::*;
 use daemon::{Daemon, TransferData};
 use rocket::response::{NamedFile, status::NotFound};
-use sbbw_widget_conf::validate_config_toml;
+use sbbw_widget_conf::{get_widgets, get_widgets_path, validate_config_toml};
 use std::{net::IpAddr, rc::Rc, path::PathBuf};
 
 #[macro_use] extern crate rocket;
 
-use utils::get_widgets;
-
-use crate::utils::get_widgets_path;
-
 mod daemon;
-mod utils;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
@@ -28,8 +23,7 @@ fn load_widget(file: PathBuf) -> Result<NamedFile, NotFound<String>> {
 #[tokio::main]
 async fn main() {
     // convert themes into &[&str]
-    let mut widgets = get_widgets();
-    widgets.push("internal".to_string());
+    let widgets = get_widgets();
     let widgets: Vec<&str> = widgets.iter().map(|s| s.as_str()).collect();
     let matches = App::new("Sbbw Daemon")
         .about(DESCRIPTION)
