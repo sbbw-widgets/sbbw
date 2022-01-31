@@ -9,5 +9,5 @@ x = 0.0
 y = 0.0
 transparent = true
 blur = true
-allways_on_top = true
+always_on_top = true
 EOF

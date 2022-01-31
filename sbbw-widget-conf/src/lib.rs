@@ -4,7 +4,7 @@ use serde::{
     de::{self, Deserializer},
     Deserialize, Serialize, Serializer,
 };
-use std::path::PathBuf;
+use std::{path::PathBuf, fs};
 
 fn deserialize_widget_size<'de, D>(de: D) -> Result<WidgetSize, D::Error>
 where
@@ -65,7 +65,7 @@ pub struct WidgetConfig {
     pub y: f32,
     pub transparent: bool, // Only works on Windows and Mac. For the linux users can be set with compositor
     pub blur: bool,
-    pub allways_on_top: bool,
+    pub always_on_top: bool,
 }
 
 impl Default for WidgetConfig {
@@ -79,7 +79,7 @@ impl Default for WidgetConfig {
             y: 0.0,
             transparent: true,
             blur: true,
-            allways_on_top: true,
+            always_on_top: true,
         }
     }
 }
@@ -120,8 +120,8 @@ impl WidgetConfig {
         self.blur = blur;
     }
 
-    pub fn set_allways_on_top(&mut self, allways_on_top: bool) {
-        self.allways_on_top = allways_on_top;
+    pub fn set_always_on_top(&mut self, allways_on_top: bool) {
+        self.always_on_top = allways_on_top;
     }
 }
 
@@ -147,6 +147,39 @@ pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> 
     validate_config_from_string(&conf_str.as_str())
 }
 
+
+
+pub fn get_config_path() -> PathBuf {
+    let mut path = dirs::config_dir().unwrap();
+    path.push("sbbw");
+    fs::create_dir_all(&path).unwrap();
+    path
+}
+pub fn get_widgets_path() -> PathBuf {
+    let mut path = get_config_path();
+    path.push("widgets");
+    fs::create_dir_all(&path).unwrap();
+    path
+}
+pub fn get_widgets() -> Vec<String> {
+    let paths = fs::read_dir(get_widgets_path()).unwrap();
+    paths.filter_map(|path| {
+        let path = path.unwrap().path();
+        if path.is_dir() {
+            // if config file exist on folder
+            let mut config_path = path.clone();
+            config_path.push("config.toml");
+            if config_path.exists() {
+                Some(path.file_name().unwrap().to_str().unwrap().to_string())
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
@@ -165,7 +198,7 @@ mod tests {
         assert_eq!(conf.y, 0.0);
         assert_eq!(conf.transparent, true);
         assert_eq!(conf.blur, true);
-        assert_eq!(conf.allways_on_top, true);
+        assert_eq!(conf.always_on_top, true);
     }
 
     #[test]
@@ -179,7 +212,7 @@ mod tests {
             y = 0.0
             transparent = true
             blur = true
-            allways_on_top=true
+            always_on_top=true
         "#;
         let conf = super::validate_config_from_string(raw_conf).unwrap();
 
@@ -191,7 +224,7 @@ mod tests {
         assert_eq!(conf.y, 0.0);
         assert_eq!(conf.transparent, true);
         assert_eq!(conf.blur, true);
-        assert_eq!(conf.allways_on_top, true);
+        assert_eq!(conf.always_on_top, true);
     }
 
     #[test]
@@ -201,7 +234,7 @@ mod tests {
             class_name = "Test Class"
             width = "200.0"
             x = 0.0
-            allways_on_top=true
+            always_on_top=true
         "#;
         let conf = super::validate_config_from_string(raw_conf).unwrap();
 
@@ -213,6 +246,6 @@ mod tests {
         assert_eq!(conf.y, 0.0);
         assert_eq!(conf.transparent, true);
         assert_eq!(conf.blur, true);
-        assert_eq!(conf.allways_on_top, true);
+        assert_eq!(conf.always_on_top, true);
     }
 }
