@@ -2,7 +2,7 @@
 members = [
     "sbbw",
     "sbbw-widget-conf",
-    "sbbw-widget/src-tauri",
+    "sbbw-widget",
 ]
 
 [profile.release]
