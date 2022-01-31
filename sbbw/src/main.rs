@@ -2,11 +2,12 @@
 use clap::{App, Arg};
 use colored::*;
 use daemon::{Daemon, TransferData};
-use rocket::response::{NamedFile, status::NotFound};
+use rocket::response::{status::NotFound, NamedFile};
 use sbbw_widget_conf::{get_widgets, get_widgets_path, validate_config_toml};
-use std::{net::IpAddr, rc::Rc, path::PathBuf};
+use std::{net::IpAddr, path::PathBuf, rc::Rc, process::Command, sync::{Arc, Mutex}, collections::HashMap};
 
-#[macro_use] extern crate rocket;
+#[macro_use]
+extern crate rocket;
 
 mod daemon;
 
@@ -143,6 +144,18 @@ async fn main() {
         return;
     }
 
+    match Command::new("sbbw-widget").spawn() {
+        Ok(_) => println!("{}", "Binary for launch Widgets alredy exists".green()),
+        Err(e) => {
+            println!(
+                "{} reason: {:?}",
+                "Binary for launch Widgets not found".red().bold(),
+                e
+            );
+            return;
+        }
+    }
+
     let ip = "0.0.0.0".parse::<IpAddr>().unwrap();
     let port: u16 = matches.value_of("port").unwrap().parse::<u16>().unwrap();
 
@@ -151,13 +164,38 @@ async fn main() {
         daemon.set_command(command, value_command);
     }
 
+    // create hashmap for save all subprocess excecuted with widget-name as key
+    let subprocesses = Arc::new(Mutex::new(HashMap::new()));
+
     let receiver_data_callback = Rc::new(move |response: TransferData| match response {
         TransferData::Get((command, data)) => match command.as_str() {
             "open" => {
+                if subprocesses.lock().unwrap().contains_key(&data) {
+                    println!(
+                        "{}",
+                        "Widget {} already opened".red().replace("{}", &data.yellow().bold())
+                    );
+                    return;
+                }
                 println!("Open: {:?}", data);
+                let subprocess = Command::new("sbbw-widget")
+                    .arg(data.as_str())
+                    .spawn()
+                    .unwrap();
+                subprocesses.lock().unwrap().insert(data, subprocess);
             }
             "close" => {
+                if !subprocesses.lock().unwrap().contains_key(&data) {
+                    println!(
+                        "{}",
+                        "Widget {} not running".red().replace("{}", &data.yellow().bold())
+                    );
+                    return;
+                }
                 println!("Close: {:?}", data);
+                if let Some(mut subprocess) = subprocesses.lock().unwrap().remove(&data) {
+                    subprocess.kill().unwrap();
+                }
             }
             _ => {
                 panic!("{}", "Unknown command".red().bold());
