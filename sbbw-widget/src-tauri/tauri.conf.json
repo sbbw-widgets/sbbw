@@ -4,7 +4,7 @@
     "version": "0.1.0"
   },
   "build": {
-    "distDir": "../build",
+    "distDir": "http://localhost:3000",
     "devPath": "http://localhost:3000",
     "beforeDevCommand": "yarn start",
     "beforeBuildCommand": "yarn build"
@@ -52,13 +52,6 @@
       "all": true
     },
     "windows": [
-      {
-        "title": "Sbbw Widget",
-        "width": 800,
-        "height": 600,
-        "resizable": true,
-        "fullscreen": false
-      }
     ],
     "security": {
       "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'"
