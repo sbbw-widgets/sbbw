@@ -14,10 +14,10 @@ where
     match s.to_ascii_lowercase().as_str() {
         "max" => Ok(WidgetSize::Max),
         _ => {
-            let v = s.parse::<f32>();
+            let v = s.parse::<f64>();
             if v.is_err() {
                 return Err(de::Error::custom(format!(
-                    "[{}] Invalid widget size (Cannot convert into f32): {}",
+                    "[{}] Invalid widget size (Cannot convert into f64): {}",
                     "Error".red().bold(),
                     s
                 )));
@@ -30,7 +30,7 @@ where
 #[derive(Clone, Debug, PartialEq)]
 pub enum WidgetSize {
     Max,
-    Value(f32),
+    Value(f64),
 }
 
 impl Serialize for WidgetSize {
@@ -66,6 +66,7 @@ pub struct WidgetConfig {
     pub transparent: bool, // Only works on Windows and Mac. For the linux users can be set with compositor
     pub blur: bool,
     pub always_on_top: bool,
+    pub stick: bool,
 }
 
 impl Default for WidgetConfig {
@@ -80,6 +81,7 @@ impl Default for WidgetConfig {
             transparent: true,
             blur: true,
             always_on_top: true,
+            stick: true,
         }
     }
 }
@@ -88,7 +90,7 @@ impl WidgetConfig {
     pub fn new(name: String) -> Self {
         WidgetConfig {
             name: name.clone(),
-            class_name: name.to_uppercase(),
+            class_name: name.to_uppercase().replace(" ", "_"),
             ..Default::default()
         }
     }

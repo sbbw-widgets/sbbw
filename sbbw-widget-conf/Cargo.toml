@@ -4,11 +4,6 @@ version = "0.1.0"
 authors = ["Sergio Ribera"]
 edition = "2021"
 
-[profile.release]
-opt-level = "z" # Optimize for size.
-strip = true    # Automatically strip symbols from the binary.
-lto = true
-
 [dependencies]
 toml = "0.5"
 colored = "2.0.0"
