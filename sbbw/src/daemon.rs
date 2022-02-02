@@ -100,7 +100,6 @@ impl Daemon {
         for stream in listener.incoming() {
             match stream {
                 Ok(mut stream) => {
-                    println!("New connection: {}", stream.peer_addr().unwrap());
                     self.handle_client(&mut stream).await
                 }
                 Err(e) => {
@@ -130,6 +129,7 @@ impl Daemon {
     pub fn send_command(&self, client_stream: Option<TcpStream>, command: String, data: String) {
         match client_stream.as_ref() {
             Some(mut stream) => {
+                println!("{}: \"{}\" \"{}\"", "Sending command to daemon".blue().bold(), command, data);
                 let data_response = format!("{}:{}", command, data);
                 stream.write(data_response.as_bytes()).unwrap();
                 stream.flush().unwrap();

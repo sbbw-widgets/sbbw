@@ -1,10 +1,18 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#![feature(proc_macro_hygiene, decl_macro, str_split_as_str)]
 use clap::{App, Arg};
 use colored::*;
 use daemon::{Daemon, TransferData};
-use rocket::response::{status::NotFound, NamedFile};
-use sbbw_widget_conf::{get_widgets, get_widgets_path, validate_config_toml};
-use std::{net::IpAddr, path::PathBuf, rc::Rc, process::Command, sync::{Arc, Mutex}, collections::HashMap};
+use rocket::response::{content, status::NotFound, NamedFile};
+use sbbw_widget_conf::{get_widgets, get_widgets_path, validate_config_toml, get_config_path};
+use std::{
+    collections::HashMap,
+    env,
+    net::{IpAddr, TcpStream},
+    path::PathBuf,
+    process::{Command, Stdio},
+    rc::Rc,
+    sync::{Arc, Mutex}, fs::File,
+};
 
 #[macro_use]
 extern crate rocket;
@@ -17,8 +25,63 @@ const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 
 #[get("/<file..>")]
 fn load_widget(file: PathBuf) -> Result<NamedFile, NotFound<String>> {
-    let path = get_widgets_path().join(file);
-    NamedFile::open(&path).map_err(|e| NotFound(e.to_string()))
+    println!("{} {}", "Loading:".green().bold(), file.to_str().unwrap());
+    let path = get_widgets_path().join(&file);
+    if path.is_file() {
+        NamedFile::open(&path).map_err(|e| NotFound(e.to_string()))
+    } else if path.is_dir() {
+        NamedFile::open(&path.join("index.html")).map_err(|e| NotFound(e.to_string()))
+    } else {
+        let mut path_arr = file.to_str().unwrap().split("/");
+        let widget_name = path_arr.next().unwrap();
+        let file = PathBuf::from(path_arr.as_str());
+        let path = get_widgets_path().join(widget_name).join("ui").join(&file);
+        println!("{} {}", "Path converted:".green().bold(), &path.to_str().unwrap());
+        NamedFile::open(&path).map_err(|e| NotFound(e.to_string()))
+    }
+}
+
+#[catch(404)]
+fn default_catcher() -> content::Html<&'static str> {
+    content::Html(
+        r#"
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            align-items: center;
+            background: #fafafa;
+            display: flex;
+            flex-flow: column wrap;
+            height: 100vh;
+            justify-content: center;
+            overflow: hidden;
+            width: 100%;
+        }
+        h1 {
+            color: #404040;
+            font-size: 8em;
+            font-weight: 200;
+        }
+        span {
+            color: #404040;
+            font-size: 1.5em;
+            font-weight: 200;
+        }
+    </style>
+    </head>
+    <body>
+        <h1>404</h1>
+        <span>A error ocurred</span>
+    </body>
+</html>
+    "#,
+    )
 }
 
 #[tokio::main]
@@ -173,13 +236,18 @@ async fn main() {
                 if subprocesses.lock().unwrap().contains_key(&data) {
                     println!(
                         "{}",
-                        "Widget {} already opened".red().replace("{}", &data.yellow().bold())
+                        "Widget {} already opened"
+                            .red()
+                            .replace("{}", &data.yellow().bold())
                     );
                     return;
                 }
                 println!("Open: {:?}", data);
+                let f = File::create(get_config_path().join(".log")).unwrap();
+                let out = Stdio::from(f);
                 let subprocess = Command::new("sbbw-widget")
                     .arg(data.as_str())
+                    .stderr(out)
                     .spawn()
                     .unwrap();
                 subprocesses.lock().unwrap().insert(data, subprocess);
@@ -188,7 +256,9 @@ async fn main() {
                 if !subprocesses.lock().unwrap().contains_key(&data) {
                     println!(
                         "{}",
-                        "Widget {} not running".red().replace("{}", &data.yellow().bold())
+                        "Widget {} not running"
+                            .red()
+                            .replace("{}", &data.yellow().bold())
                     );
                     return;
                 }
@@ -198,13 +268,26 @@ async fn main() {
                 }
             }
             _ => {
-                panic!("{}", "Unknown command".red().bold());
+                println!("{}", "Unknown command".red().bold());
             }
         },
         _ => {}
     });
     daemon.set_callbacks(receiver_data_callback);
 
-    tokio::spawn(async { rocket::ignite().mount("/", routes![load_widget]).launch() });
+    tokio::spawn(async move {
+        // let mut config = rocket::Config::new(rocket::config::Environment::Production);
+        // config.set_log_level(rocket::config::LoggingLevel::Debug);
+        match TcpStream::connect(("0.0.0.0", port)) {
+            Ok(_) => {},
+            Err(_) => {
+                let err = rocket::ignite()
+                    .mount("/", routes![load_widget])
+                    .register(catchers![default_catcher])
+                    .launch();
+                drop(err);
+            },
+        }
+    });
     tokio::join!(async move { daemon.run().await });
 }
