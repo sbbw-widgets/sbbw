@@ -9,11 +9,6 @@ default-run = "sbbw-widget"
 edition = "2018"
 build = "src/build.rs"
 
-[profile.release]
-opt-level = "z" # Optimize for size.
-strip = true    # Automatically strip symbols from the binary.
-lto = true
-
 [build-dependencies]
 tauri-build = { version = "1.0.0-beta.4" }
 
@@ -27,6 +22,9 @@ sbbw-widget-conf = { path = "../sbbw-widget-conf" }
 # Tauri Plugins
 tauri-plugin-positioner = "0.2"
 tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibrancy", features = ["tauri-impl"] }
+
+[target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
+gtk = { version = "0.14", features = [ "v3_20" ] }
 
 [features]
 default = [ "custom-protocol" ]

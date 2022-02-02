@@ -3050,7 +3050,6 @@ dependencies = [
  "sbbw-widget-conf",
  "serde",
  "serde_json",
- "subprocess",
  "tokio",
  "tokio-io",
 ]
@@ -3060,6 +3059,7 @@ name = "sbbw-widget"
 version = "0.1.0"
 dependencies = [
  "colored",
+ "gtk",
  "sbbw-widget-conf",
  "serde",
  "serde_json",
@@ -3449,16 +3449,6 @@ dependencies = [
  "proc-macro2 1.0.36",
  "quote 1.0.15",
  "syn 1.0.86",
-]
-
-[[package]]
-name = "subprocess"
-version = "0.2.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "055cf3ebc2981ad8f0a5a17ef6652f652d87831f79fddcba2ac57bcb9a0aa407"
-dependencies = [
- "libc",
- "winapi",
 ]
 
 [[package]]
