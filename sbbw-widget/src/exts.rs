@@ -1,6 +1,6 @@
 
 use gtk::prelude::GtkWindowExt;
-use tauri::{Runtime, Window};
+use wry::application::{window::Window, platform::unix::WindowExtUnix};
 
 pub trait ManagedWindow {
     fn set_role(&self, name: &str, class: &str);
@@ -8,9 +8,7 @@ pub trait ManagedWindow {
     fn stick(&self);
 }
 
-impl<R> ManagedWindow for Window<R>
-where
-    R: Runtime,
+impl ManagedWindow for Window
 {
     fn set_role(&self, name: &str, class: &str) {
         #[cfg(any(
@@ -21,7 +19,7 @@ where
             target_os = "netbsd"
         ))]
         {
-            let gtk_win = self.gtk_window().unwrap();
+            let gtk_win = self.gtk_window();
             gtk_win.set_role(format!("{}_{}", name, class).as_str());
         }
     }
@@ -35,7 +33,7 @@ where
             target_os = "netbsd"
         ))]
         {
-            let gtk_win = self.gtk_window().unwrap();
+            let gtk_win = self.gtk_window();
             gtk_win.stick();
         }
         #[cfg(target_os = "macos")]

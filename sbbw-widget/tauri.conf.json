@@ -4,8 +4,8 @@
     "version": "0.1.0"
   },
   "build": {
-    "distDir": "http://localhost:8000",
-    "devPath": "http://localhost:3000",
+    "distDir": "./index.html",
+    "devPath": "./index.html",
     "beforeDevCommand": "yarn start",
     "beforeBuildCommand": "yarn build"
   },

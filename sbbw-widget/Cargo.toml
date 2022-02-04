@@ -7,25 +7,26 @@ license = ""
 repository = "https://github.com/SergioRibera/sbbw"
 default-run = "sbbw-widget"
 edition = "2018"
-build = "src/build.rs"
+# build = "src/build.rs"
 
-[build-dependencies]
-tauri-build = { version = "1.0.0-beta.4" }
+# [build-dependencies]
+# tauri-build = { version = "1.0.0-beta.4" }
 
 [dependencies]
 serde_json = "1.0"
 colored = "2.0.0"
-url = "2.2.2"
+hlua = "0.3"
+wry = "0.12.2"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.0.0-beta.8", features = ["api-all"] }
+tao = { git = "https://github.com/tauri-apps/tao", branch = "next", default-features = false, features = [ "serde" ] }
+# tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next", features = ["api-all"] }
 sbbw-widget-conf = { path = "../sbbw-widget-conf" }
 # Tauri Plugins
-tauri-plugin-positioner = "0.2"
-tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibrancy", features = ["tauri-impl"] }
+tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibrancy", features = ["tao-impl"] }
 
 [target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
 gtk = { version = "0.14", features = [ "v3_20" ] }
 
-[features]
-default = [ "custom-protocol" ]
-custom-protocol = [ "tauri/custom-protocol" ]
+# [features]
+# default = [ "custom-protocol" ]
+# custom-protocol = [ "tauri/custom-protocol" ]
