@@ -76,7 +76,7 @@ impl Daemon {
                 }
                 println!("Size of data: {}", size);
                 println!("Content of data: {}", data);
-                let data_split = data.split(':').map(String::from).collect::<Vec<String>>();
+                let data_split = data.split('|').map(String::from).collect::<Vec<String>>();
                 let data_response =
                     TransferData::Get((data_split[0].clone(), data_split[1].clone()));
                 (self.callback.as_ref().unwrap())(data_response);
@@ -130,7 +130,7 @@ impl Daemon {
         match client_stream.as_ref() {
             Some(mut stream) => {
                 println!("{}: \"{}\" \"{}\"", "Sending command to daemon".blue().bold(), command, data);
-                let data_response = format!("{}:{}", command, data);
+                let data_response = format!("{}|{}", command, data);
                 stream.write(data_response.as_bytes()).unwrap();
                 stream.flush().unwrap();
                 stream.shutdown(Shutdown::Both).unwrap();
