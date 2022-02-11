@@ -9,8 +9,11 @@ mod lua_mod;
 use exts::*;
 use hlua::{Lua, LuaError, LuaTable};
 use serde::{Deserialize, Serialize};
+use tao::window::WindowId;
+use url::Url;
 
 use std::{
+    collections::HashMap,
     env,
     fs::{self, File},
     path::{Path, PathBuf},
@@ -28,19 +31,31 @@ use wry::{
         event_loop::{ControlFlow, EventLoop},
         window::{Fullscreen, Window, WindowBuilder},
     },
-    webview::{RpcRequest, RpcResponse, WebViewBuilder},
+    http::{
+        header::{CONTENT_TYPE, ORIGIN},
+        status::StatusCode,
+        Request, Response, ResponseBuilder,
+    },
+    webview::{WebView, WebViewBuilder},
     Value,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct Params {
-    pub file: String,
+    pub method: String,
+    pub command: String,
     pub args: Vec<String>,
+}
+
+#[derive(Serialize)]
+struct SbbwResponse {
+    pub status: u16,
+    pub data: String,
 }
 
 #[allow(dead_code)]
 fn exec_lua(params: Params, lua: &mut Lua<'static>) -> String {
-    let file = params.file;
+    let file = params.command;
     let file_name = if file.ends_with(".lua") {
         file
     } else {
@@ -52,7 +67,7 @@ fn exec_lua(params: Params, lua: &mut Lua<'static>) -> String {
 }
 
 fn exec_command(pwd: String, params: Params) -> String {
-    let file = params.file;
+    let file = params.command;
     println!("{}", file);
     let mut args = params.args;
     if file.starts_with("./") {
@@ -105,6 +120,8 @@ fn exec_command(pwd: String, params: Params) -> String {
 
 fn main() {
     let args: Vec<_> = env::args().collect();
+    println!("{:?}", args.len());
+    println!("{:?}", args);
     if args.len() > 1 {
         let widgets = get_widgets();
         if widgets.contains(&args[1]) {
@@ -112,7 +129,18 @@ fn main() {
             let path_to_widget_conf = get_widgets_path().join(&widget_name).join("config.toml");
             let path_scripts = get_widgets_path().join(&widget_name).join("scripts");
             let widget_conf = sbbw_widget_conf::validate_config_toml(path_to_widget_conf).unwrap();
-            let url_ui = format!("http://localhost:8000/{}/ui", widget_name);
+            let mut is_testing = false;
+            let url_ui = if args.len() == 3 {
+                if args[2].contains("http") {
+                    is_testing = true;
+                    args[2].to_string()
+                } else {
+                    format!("http://localhost:8000/{}/ui", widget_name)
+                }
+            } else {
+                format!("http://localhost:8000/{}/ui", widget_name)
+            };
+            println!("{:?}", url_ui);
             let widget_conf_clone = widget_conf.clone();
 
             // let widget_scripts_vec: Vec<String> = fs::read_dir(path_scripts)
@@ -179,58 +207,102 @@ fn main() {
             // sbbw_table.set("widget_conf", widget_conf.clone().into());
             // sbbw_table.set("widget_scripts", widget_scripts_vec.into());
             // lua.globals_table().set("sbbw", &mut sbbw_table.into());
+            //
+            let shared_webview: Arc<Mutex<Option<WebView>>>;
 
-            let handler = move |_window: &Window, mut req: RpcRequest| {
-                println!("{:?}", &req.params);
-                let params: Option<Params> = if let Some(params) = req.params.take() {
-                    let a = if let Ok(mut args) =
-                        serde_json::from_value::<Vec<Params>>(params)
-                    {
-                        println!("{:?}", args[0]);
-                        Some(args.remove(0))
-                    } else {
-                        println!("{:?}", req.params);
-                        None
-                    };
-                    Some(a.unwrap())
-                } else {
-                    println!("No params");
-                    None
-                };
-                // let mut response = if &req.method == "exec-lua" {
-                //     Some(RpcResponse::new_result(
-                //         req.id.take(),
-                //         Some(Value::String(exec_lua(params.unwrap(), lua))),
-                //     ))
-                // } else 
-                let response = if &req.method == "exec" {
-                    Some(RpcResponse::new_result(
-                        req.id.take(),
-                        Some(Value::String(exec_command(String::from(path_scripts.to_str().unwrap()), params.unwrap()))),
-                    ))
-                } else {
-                    Some(RpcResponse::new_result(
-                        req.id.take(),
-                        Some(Value::String(format!("Command \"{}\" not found", &req.method).to_string())),
-                    ))
-                };
-                response
-            };
-
-            let _webview = WebViewBuilder::new(window)
+            let webview = WebViewBuilder::new(window)
                 .unwrap()
                 .with_url(&url_ui)
                 .unwrap()
-                .with_rpc_handler(handler)
+                .with_initialization_script(
+                    r#"
+                    const executeCommand = (command, args) => {
+                      return new Promise((resolve, reject) => {
+                          window.ipc.postMessage(JSON.stringify({ method: "exec", command, args }))
+                          window.addEventListener("sbbw-response", ({method, response}) => {
+                            if (response.status == 200)
+                              resolve(response.data)
+                            else
+                              reject({ code: response.status, data: response.data })
+                          })
+                      })
+                    }
+                "#,
+                )
+                .with_ipc_handler(move |_win, msg| {
+                    let mut response = SbbwResponse {
+                        status: StatusCode::OK.as_u16(),
+                        data: "{}".to_string(),
+                    };
+                    let params: Option<Params> =
+                        if let Ok(params) = serde_json::from_str(msg.as_str()) {
+                            Some(params)
+                        } else {
+                            response.status = StatusCode::BAD_REQUEST.as_u16();
+                            response.data = "Invalid JSON sended".to_string();
+                            Some(Params {
+                                method: "".to_string(),
+                                command: "".to_string(),
+                                args: Vec::new(),
+                            })
+                        };
+                    println!("params: {:?}", &params.as_ref().unwrap());
+
+                    let method = &params.as_ref().unwrap().method;
+                    // let mut response = if &req.method == "exec-lua" {
+                    //     Some(RpcResponse::new_result(
+                    //         req.id.take(),
+                    //         Some(Value::String(exec_lua(params.unwrap(), lua))),
+                    //     ))
+                    // } else
+                    if method.is_empty() {
+                        response.status = StatusCode::NOT_FOUND.as_u16();
+                        response.data = "Invalid command".to_string();
+                    } else {
+                        if method.trim().eq("exec") {
+                            if response.status == StatusCode::OK {
+                                response.status = StatusCode::OK.as_u16();
+                                response.data = exec_command(
+                                    String::from(path_scripts.to_str().unwrap()),
+                                    params.unwrap(),
+                                );
+                            }
+                        } else {
+                            response.status = StatusCode::NOT_FOUND.as_u16();
+                            response.data =
+                                format!("Command \"{}\" not found", &method).to_string();
+                        };
+                    }
+                    let webview = &shared_webview.lock().unwrap().unwrap();
+                    let response_json = serde_json::to_string(&response).unwrap();
+                    webview.evaluate_script(
+                        format!(
+                            r#"
+                                document.dispatchEvent(new CustomEvent("sbbw-response", {{
+                                    method: "executeCommand",
+                                    response: {}
+                                }}));
+                                "#,
+                            response_json
+                        )
+                        .as_str(),
+                    );
+                })
                 .with_transparent(widget_conf.transparent)
+                .with_dev_tool(is_testing)
                 .build()
                 .unwrap();
+
+            if is_testing {
+                webview.devtool();
+            }
+            shared_webview = Arc::new(Mutex::new(Some(webview)));
 
             event_loop.run(move |event, _, control_flow| {
                 *control_flow = ControlFlow::Wait;
 
                 match event {
-                    _ => { }
+                    _ => {}
                 }
             });
         } else {
