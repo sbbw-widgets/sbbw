@@ -1,6 +1,23 @@
 
+#[cfg(any(
+    target_os = "linux",
+    target_os = "dragonfly",
+    target_os = "freebsd",
+    target_os = "openbsd",
+    target_os = "netbsd"
+))]
 use gtk::prelude::GtkWindowExt;
-use wry::application::{window::Window, platform::unix::WindowExtUnix};
+
+#[cfg(any(
+    target_os = "linux",
+    target_os = "dragonfly",
+    target_os = "freebsd",
+    target_os = "openbsd",
+    target_os = "netbsd"
+))]
+use wry::application::platform::unix::WindowExtUnix;
+
+use wry::application::window::Window;
 
 pub trait ManagedWindow {
     fn set_role(&self, name: &str, class: &str);
@@ -8,8 +25,7 @@ pub trait ManagedWindow {
     fn stick(&self);
 }
 
-impl ManagedWindow for Window
-{
+impl ManagedWindow for Window {
     fn set_role(&self, name: &str, class: &str) {
         #[cfg(any(
             target_os = "linux",
@@ -37,7 +53,6 @@ impl ManagedWindow for Window
             gtk_win.stick();
         }
         #[cfg(target_os = "macos")]
-        {
-        }
+        {}
     }
 }
