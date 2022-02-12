@@ -219,6 +219,7 @@ fn main() {
                 .unwrap()
                 .with_initialization_script(
                     r#"
+document.addEventListener('contextmenu', event => event.preventDefault());
                     const executeCommand = (command, args) => {
                       return new Promise((resolve, reject) => {
                           window.ipc.postMessage(JSON.stringify({ method: "exec", command, args }))
