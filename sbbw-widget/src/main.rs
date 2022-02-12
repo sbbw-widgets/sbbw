@@ -13,6 +13,7 @@ use tao::window::WindowId;
 use url::Url;
 
 use std::{
+    cell::RefCell,
     collections::HashMap,
     env,
     fs::{self, File},
@@ -120,8 +121,8 @@ fn exec_command(pwd: String, params: Params) -> String {
 
 fn main() {
     let args: Vec<_> = env::args().collect();
-    println!("{:?}", args.len());
-    println!("{:?}", args);
+    // println!("{:?}", args.len());
+    // println!("{:?}", args);
     if args.len() > 1 {
         let widgets = get_widgets();
         if widgets.contains(&args[1]) {
@@ -140,7 +141,7 @@ fn main() {
             } else {
                 format!("http://localhost:8000/{}/ui", widget_name)
             };
-            println!("{:?}", url_ui);
+            // println!("{:?}", url_ui);
             let widget_conf_clone = widget_conf.clone();
 
             // let widget_scripts_vec: Vec<String> = fs::read_dir(path_scripts)
@@ -208,7 +209,9 @@ fn main() {
             // sbbw_table.set("widget_scripts", widget_scripts_vec.into());
             // lua.globals_table().set("sbbw", &mut sbbw_table.into());
             //
-            let shared_webview: Arc<Mutex<Option<WebView>>>;
+            thread_local! {
+                static WEBVIEWS: RefCell<Option<WebView>> = RefCell::new(None);
+            }
 
             let webview = WebViewBuilder::new(window)
                 .unwrap()
@@ -219,7 +222,8 @@ fn main() {
                     const executeCommand = (command, args) => {
                       return new Promise((resolve, reject) => {
                           window.ipc.postMessage(JSON.stringify({ method: "exec", command, args }))
-                          window.addEventListener("sbbw-response", ({method, response}) => {
+                          document.addEventListener("sbbw-response", (e) => {
+                            let response = e.detail.response
                             if (response.status == 200)
                               resolve(response.data)
                             else
@@ -246,7 +250,7 @@ fn main() {
                                 args: Vec::new(),
                             })
                         };
-                    println!("params: {:?}", &params.as_ref().unwrap());
+                    // println!("params: {:?}", &params.as_ref().unwrap());
 
                     let method = &params.as_ref().unwrap().method;
                     // let mut response = if &req.method == "exec-lua" {
@@ -273,20 +277,22 @@ fn main() {
                                 format!("Command \"{}\" not found", &method).to_string();
                         };
                     }
-                    let webview = &shared_webview.lock().unwrap().unwrap();
-                    let response_json = serde_json::to_string(&response).unwrap();
-                    webview.evaluate_script(
-                        format!(
-                            r#"
-                                document.dispatchEvent(new CustomEvent("sbbw-response", {{
-                                    method: "executeCommand",
-                                    response: {}
-                                }}));
-                                "#,
+                    WEBVIEWS.with(|ref_webview| {
+                        let webviews = ref_webview.borrow();
+                        let webview = webviews.as_ref().unwrap();
+                        let response_json = serde_json::to_string(&response).unwrap();
+                        // println!("response: {}", &response_json);
+                        let js = format!(
+                            r#"document.dispatchEvent(new CustomEvent("sbbw-response", {{ "detail": {{
+                                method: "exec",
+                                response: {}
+                            }} }}));
+                            "#,
                             response_json
-                        )
-                        .as_str(),
-                    );
+                        );
+                        // println!("js: {}", js.as_str());
+                        webview.evaluate_script(js.as_str()).unwrap();
+                    });
                 })
                 .with_transparent(widget_conf.transparent)
                 .with_dev_tool(is_testing)
@@ -296,7 +302,10 @@ fn main() {
             if is_testing {
                 webview.devtool();
             }
-            shared_webview = Arc::new(Mutex::new(Some(webview)));
+
+            WEBVIEWS.with(|ref_webview| {
+                ref_webview.replace(Some(webview));
+            });
 
             event_loop.run(move |event, _, control_flow| {
                 *control_flow = ControlFlow::Wait;
