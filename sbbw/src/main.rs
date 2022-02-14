@@ -4,6 +4,7 @@ use colored::*;
 use daemon::{Daemon, TransferData};
 use rocket::response::{content, status::NotFound, NamedFile};
 use sbbw_widget_conf::{get_config_path, get_widgets, get_widgets_path, validate_config_toml};
+use sbbw_exec::autostarts;
 use std::{
     collections::HashMap,
     env,
@@ -268,6 +269,8 @@ async fn main() {
             return;
         }
     }
+
+    autostarts();
 
     let ip = "0.0.0.0".parse::<IpAddr>().unwrap();
     let port: u16 = matches.value_of("port").unwrap().parse::<u16>().unwrap();
