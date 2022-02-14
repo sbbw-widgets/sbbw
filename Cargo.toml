@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "sbbw",
+    "sbbw-exec",
     "sbbw-widget-conf",
     "sbbw-widget",
 ]

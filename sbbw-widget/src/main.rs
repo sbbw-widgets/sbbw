@@ -5,9 +5,7 @@
     windows_subsystem = "windows"
 )]
 mod exts;
-mod lua_mod;
 use exts::*;
-use hlua::{Lua, LuaError, LuaTable};
 use serde::{Deserialize, Serialize};
 use tao::window::WindowId;
 use url::Url;
@@ -23,6 +21,7 @@ use std::{
 
 use colored::*;
 use sbbw_widget_conf::{get_widgets, get_widgets_path, WidgetSize};
+use sbbw_exec::{Params, exec_command};
 use tauri_plugin_vibrancy::Vibrancy;
 
 use wry::{
@@ -41,82 +40,10 @@ use wry::{
     Value,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Params {
-    pub method: String,
-    pub command: String,
-    pub args: Vec<String>,
-}
-
 #[derive(Serialize)]
 struct SbbwResponse {
     pub status: u16,
     pub data: String,
-}
-
-#[allow(dead_code)]
-fn exec_lua(params: Params, lua: &mut Lua<'static>) -> String {
-    let file = params.command;
-    let file_name = if file.ends_with(".lua") {
-        file
-    } else {
-        format!("{}.lua", file)
-    };
-    let path = Path::new(&file_name);
-    let script = File::open(path).unwrap();
-    lua.execute_from_reader::<String, _>(script).unwrap()
-}
-
-fn exec_command(pwd: String, params: Params) -> String {
-    let file = params.command;
-    println!("{}", file);
-    let mut args = params.args;
-    if file.starts_with("./") {
-        args.insert(0, file.clone());
-    }
-    println!("{:?}", args);
-    let output = if cfg!(target_os = "windows") {
-        std::process::Command::new("cmd")
-            .args(&["/C", "start"])
-            .args(&args)
-            .output()
-    } else {
-        if file.starts_with("./") {
-            println!("Execute sh command");
-            std::process::Command::new("sh")
-                .arg("-c")
-                .arg(&args.join(" "))
-                .current_dir(pwd)
-                .stdout(std::process::Stdio::piped())
-                .stderr(std::process::Stdio::piped())
-                .output()
-        } else {
-            println!("Execute command");
-            std::process::Command::new(file)
-                .args(&args)
-                .current_dir(pwd)
-                .stdout(std::process::Stdio::piped())
-                .stderr(std::process::Stdio::piped())
-                .output()
-        }
-    };
-
-    let stdout = String::from_utf8_lossy(&output.as_ref().unwrap().stdout);
-    let stderr = String::from_utf8_lossy(&output.as_ref().unwrap().stderr);
-
-    if !stderr.is_empty() {
-        println!("{}", stderr.red());
-    }
-    if !&stdout.is_empty() {
-        println!("{}", stdout.green());
-    }
-
-    println!(
-        "{}",
-        String::from_utf8_lossy(&output.as_ref().unwrap().stdout)
-    );
-
-    stdout.to_string()
 }
 
 fn main() {
@@ -201,14 +128,6 @@ fn main() {
                 }
             }
 
-            let mut lua = Lua::new();
-            lua.openlibs();
-            let mut sbbw_table = LuaTable::registry(lua);
-            sbbw_table.set("widget_name", widget_name);
-            // sbbw_table.set("widget_conf", widget_conf.clone().into());
-            // sbbw_table.set("widget_scripts", widget_scripts_vec.into());
-            // lua.globals_table().set("sbbw", &mut sbbw_table.into());
-            //
             thread_local! {
                 static WEBVIEWS: RefCell<Option<WebView>> = RefCell::new(None);
             }
@@ -270,7 +189,7 @@ document.addEventListener('contextmenu', event => event.preventDefault());
                                 response.data = exec_command(
                                     String::from(path_scripts.to_str().unwrap()),
                                     params.unwrap(),
-                                );
+                                ).unwrap();
                             }
                         } else {
                             response.status = StatusCode::NOT_FOUND.as_u16();

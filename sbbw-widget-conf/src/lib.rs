@@ -51,6 +51,14 @@ impl Default for WidgetSize {
     }
 }
 
+#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq)]
+#[serde(rename_all = "lowercase")]
+#[serde(default)]
+pub struct AutoStartCommand {
+    pub cmd: String,
+    pub args: Vec<String>,
+}
+
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
 #[serde(default)]
@@ -67,6 +75,7 @@ pub struct WidgetConfig {
     pub blur: bool,
     pub always_on_top: bool,
     pub stick: bool,
+    pub autostart: Vec<AutoStartCommand>
 }
 
 impl Default for WidgetConfig {
@@ -82,6 +91,7 @@ impl Default for WidgetConfig {
             blur: true,
             always_on_top: true,
             stick: true,
+            autostart: vec![],
         }
     }
 }
