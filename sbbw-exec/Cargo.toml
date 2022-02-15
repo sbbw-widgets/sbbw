@@ -6,7 +6,6 @@ authors = ["Sergio Ribera"]
 repository = "https://github.com/SergioRibera/sbbw"
 
 [dependencies]
-hlua = "0.3"
 toml = "0.5"
 colored = "2.0.0"
 sha-1 = "0.10.0"

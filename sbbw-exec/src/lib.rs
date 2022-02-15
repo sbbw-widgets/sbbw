@@ -7,7 +7,6 @@ use std::{
 };
 
 use colored::Colorize;
-use hlua::Lua;
 use sbbw_widget_conf::{validate_config_toml, get_widgets_path};
 use serde::{Deserialize, Serialize};
 use sha1::{Digest, Sha1};
@@ -31,14 +30,6 @@ fn generate_hash_from_file(path: PathBuf) -> Result<String, Box<dyn Error>> {
     hash.update(content_to_hash.as_bytes());
 
     Ok(format!("{:x}", hash.finalize()).to_string())
-}
-
-#[allow(dead_code)]
-pub fn exec_lua(file: PathBuf, lua: RefCell<Lua<'static>>) -> String {
-    let script = File::open(file).unwrap();
-    lua.borrow_mut()
-        .execute_from_reader::<String, _>(script)
-        .unwrap()
 }
 
 pub fn exec_command(pwd: String, params: Params) -> Result<String, String> {
@@ -95,9 +86,6 @@ pub fn exec_command(pwd: String, params: Params) -> Result<String, String> {
 
 pub fn autostarts() {
     let config_dir = get_widgets_path();
-    // let lua_context = RefCell::new(Lua::new());
-    // lua_context.borrow_mut().openlibs();
-    // let mut sbbw_table = LuaTable::registry(lua_context);
 
     // Iterate over all widget files in the config directory
     for entry in read_dir(config_dir).unwrap() {
@@ -179,26 +167,6 @@ pub fn autostarts() {
                                 }
                             }
                         }
-                        // sbbw_table.set(
-                        //     "widget_name",
-                        //     widget_path
-                        //         .file_name()
-                        //         .unwrap()
-                        //         .to_str()
-                        //         .unwrap()
-                        //         .to_string(),
-                        // );
-                        // // sbbw_table.set("widget_conf", widget_conf.clone().into());
-                        // // sbbw_table.set("widget_scripts", widget_scripts_vec.into());
-                        // // lua.globals_table().set("sbbw", &mut sbbw_table.into());
-                        // // let configs_toml = HashMap::<String, WidgetConfig>::new();
-                        // println!(
-                        //     "{}",
-                        //     exec_lua(
-                        //         widget_path.join("autostart").join(autostart.cmd),
-                        //         lua_context
-                        //     )
-                        // );
                     }
                 }
             }
