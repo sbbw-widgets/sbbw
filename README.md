@@ -51,17 +51,17 @@ OPTIONS:
 ## Widget folder struct
 ```sh
 ~
-	.config
-		sbbw
-			widgets
-				widget_name
-					ui
-						index.html
-					autostart
-						*
-					scripts
-						*
-					config.toml
+└─ .config
+	    └─ sbbw
+		        └─ widgets
+			               └─ widget_name
+				       ├─ ui
+				       │     └─ index.html
+				       ├─ autostart
+				       │      └─ *
+				       ├─ scripts
+				       │      └─ *
+				       └─ config.toml
 ```
 
 The `~` home is variable on each operative system
