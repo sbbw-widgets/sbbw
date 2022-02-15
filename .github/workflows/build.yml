@@ -9,13 +9,15 @@ on:
 
 jobs:
   build:
-    matrix:
-      rust_version: [stable]
-      platform:
-        - { target: x86_64-pc-windows-msvc, os: windows-latest }
-        - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
-        - { target: x86_64-apple-darwin, os: macos-latest }
-        - { target: aarch64-apple-ios, os: macos-latest }
+    strategy:
+      fail-fast: false
+      matrix:
+        rust_version: [stable]
+        platform:
+          - { target: x86_64-pc-windows-msvc, os: windows-latest, ext: ".exe" }
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest, ext: "" }
+          - { target: x86_64-apple-darwin, os: macos-latest, ext: "" }
+          - { target: aarch64-apple-ios, os: macos-latest, ext: "" }
 
     runs-on: ${{ matrix.platform.os }}
 
@@ -79,6 +81,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files:
-            - ./target/${{ matrix.platform.target }}/release/sbbw
-            - ./target/${{ matrix.platform.target }}/release/sbbw-widget
+          name: ${{ github.ref }}_${{ matrix.platform_target }}
+          files: |
+            ./target/${{ matrix.platform.target }}/release/sbbw${{ matrix.platform.ext }}
+            ./target/${{ matrix.platform.target }}/release/sbbw-widget${{ matrix.platform.ext }}
