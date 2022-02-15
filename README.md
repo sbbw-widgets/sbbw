@@ -1,13 +1,21 @@
 # Sbbw
 
 This is a Simple and best tool for made Widgets and tools very easy with Web technologies and generate awesome interfaces. Based on `eww` and using [Wry](https://github.com/tauri-apps/wry) as a main window rendering.
-![Preview]()
+
+![PreviewExamples](https://user-images.githubusercontent.com/56278796/153992032-82cf3c6a-f75a-475d-95ae-eb05ef6e21b5.gif)
+
 ## Examples
 ### [sidebar](https://github.com/SergioRibera/sidebar-sbbw-widget)
+![Screenshot_20220214_230856](https://user-images.githubusercontent.com/56278796/153992067-6e8a2cd3-969c-4eb2-9325-ac688489f45f.png)
+> This project is made with [Vite](https://vitejs.dev) and [ReactJs](https://reactjs.org)
 
 ### [bottombar](https://github.com/SergioRibera/bottombar-sbbw-widget)
+![image](https://user-images.githubusercontent.com/56278796/153992220-1445f40c-3ae3-4527-9df0-a4cc80e0b3ef.png)
+> This project is made with  [ReactJs](https://reactjs.org)
 
 ### [analog-clock](https://github.com/SergioRibera/analogclock-sbbw-widget)
+![Screenshot_20220214_230947](https://user-images.githubusercontent.com/56278796/153992300-eab39961-0dbf-4d73-b3bc-a146377b1761.png)
+> This project is made with [ReactJs](https://reactjs.org)
 
 ## Features
 - All Web Frameworks supported
