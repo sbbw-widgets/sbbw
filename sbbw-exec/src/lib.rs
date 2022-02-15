@@ -1,5 +1,4 @@
 use std::{
-    cell::RefCell,
     collections::HashMap,
     error::Error,
     fs::{read_dir, read_to_string, File},
