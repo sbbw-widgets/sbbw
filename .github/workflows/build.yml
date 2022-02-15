@@ -26,7 +26,7 @@ jobs:
       - name: install stable
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: nightly-2021-10-21
           target: ${{ matrix.platform.target }}
 
       - name: install webkit2gtk (ubuntu only)
