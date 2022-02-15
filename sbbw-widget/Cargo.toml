@@ -26,7 +26,7 @@ sbbw-exec = { path = "../sbbw-exec" }
 tauri-plugin-vibrancy = { git = "https://github.com/SergioRibera/tauri-plugin-vibrancy", branch = "dev", features = ["tao-impl"] }
 
 [target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
-gtk = { version = "0.15", features = [ "v3_24_30" ] }
+gtk = "0.15"
 
 # [features]
 # default = [ "custom-protocol" ]
