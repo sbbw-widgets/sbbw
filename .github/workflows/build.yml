@@ -33,7 +33,7 @@ jobs:
         if: matrix.platform.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.0 libgtksourceview-3.0-dev libappindicator3-dev
+          sudo apt-get install -y webkit2gtk-4.0 libgtksourceview-3.0-dev libappindicator3-dev libgtk-3-0
       - name: install webview2 (windows only)
         if: matrix.platform.os == 'windows-latest'
         shell: pwsh
@@ -75,8 +75,6 @@ jobs:
             ${{ matrix.platform }}-stable-cargo-core-
       - name: build release
         run: cargo build --release --workspace --target ${{ matrix.platform.target }}
-      - name: List target folder
-        run: ls . && ls ./target && ls ./target/${{ matrix.platform.target }}/release
       - name: Make Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
