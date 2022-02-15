@@ -8,5 +8,5 @@ members = [
 
 [profile.release]
 opt-level = "z" # Optimize for size.
-strip = true    # Automatically strip symbols from the binary.
+# strip = true    # Automatically strip symbols from the binary.
 lto = true
