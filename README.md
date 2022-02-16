@@ -2,6 +2,8 @@
 
 This is a Simple and best tool for made Widgets and tools very easy with Web technologies and generate awesome interfaces. Based on `eww` and using [Wry](https://github.com/tauri-apps/wry) as a main window rendering.
 
+> **Note:** Each widget is configured independently in its corresponding folder
+
 ![PreviewExamples](https://user-images.githubusercontent.com/56278796/153992032-82cf3c6a-f75a-475d-95ae-eb05ef6e21b5.gif)
 
 ## Examples
@@ -182,6 +184,7 @@ This is a list of commands, but this only have two parametters:
 - [ ] MacOS Stick windows Support
 - [x] Test widget (using web tools)
 - [x] Lua support natively (Rejected)
+- [ ] Command to install widget easiest
 - [ ] Javascript variables, like as SO, Widget Name, and more
 - [ ] More Javascript Methods (On Demmand)
 - [ ] Implement common commands natively
