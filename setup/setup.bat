@@ -6,7 +6,7 @@ goto check_Permissions
     echo Administrative permissions required. Detecting permissions...
 
     net session >nul 2>&1
-    if %errorLevel% !==! 0 (
+    if not %errorLevel% == 0 (
         echo Failure: Run as administrator.
         pause >nul
         exit /b 1
