@@ -12,9 +12,9 @@ jobs:
       matrix:
         rust_version: [stable]
         platform:
-          - { target: x86_64-pc-windows-msvc, os: windows-latest, ext: ".exe" }
-          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest, ext: "" }
-          - { target: x86_64-apple-darwin, os: macos-latest, ext: "" }
+          - { target: x86_64-pc-windows-msvc, os: windows-latest, ext: ".exe", setup_ext: ".bat" }
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest, ext: "", setup_ext: ".sh" }
+          - { target: x86_64-apple-darwin, os: macos-latest, ext: "", setup_ext: ".sh" }
 
     runs-on: ${{ matrix.platform.os }}
 
@@ -76,10 +76,11 @@ jobs:
       - name: Packaging Release Files
         uses: papeloto/action-zip@v1
         with:
-          files: target/${{ matrix.platform.target }}/release/sbbw${{ matrix.platform.ext }} target/${{ matrix.platform.target }}/release/sbbw-widget${{ matrix.platform.ext }}
+          files: target/${{ matrix.platform.target }}/release/sbbw${{ matrix.platform.ext }} target/${{ matrix.platform.target }}/release/sbbw-widget${{ matrix.platform.ext }} setup/setup${{ matrix.platform.setup_ext }}
           dest: sbbw-${{ matrix.platform.target }}.zip
       - name: Upload Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          body_path: CHANGELOG.md
           files: sbbw-${{ matrix.platform.target }}.zip

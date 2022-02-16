@@ -2,6 +2,8 @@
 
 This is a Simple and best tool for made Widgets and tools very easy with Web technologies and generate awesome interfaces. Based on `eww` and using [Wry](https://github.com/tauri-apps/wry) as a main window rendering.
 
+> **Note:** Each widget is configured independently in its corresponding folder
+
 ![PreviewExamples](https://user-images.githubusercontent.com/56278796/153992032-82cf3c6a-f75a-475d-95ae-eb05ef6e21b5.gif)
 
 ## Examples
@@ -47,21 +49,34 @@ OPTIONS:
         --test <widget_name> <local_server>    Test the widget
     -V, --version                              Print version information
 ```
+## Installation
+Agnostic to platform you need download the zip with binaries on [here](https://github.com/SergioRibera/sbbw/releases) depends of your Operative System, uncompress file and continue with next steps
+
+**Windows**
+> Only have to right click on `setup.bat` and run as Administrator for correct install
+
+**Linux/Mac**
+> Open terminal on folder uncompressed and run:
+> ```sh
+> sudo setup.sh
+> ```
+
+
 
 ## Widget folder struct
 ```sh
 ~
 └─ .config
-	    └─ sbbw
-		        └─ widgets
-			               └─ widget_name
-				       ├─ ui
-				       │     └─ index.html
-				       ├─ autostart
-				       │      └─ *
-				       ├─ scripts
-				       │      └─ *
-				       └─ config.toml
+    └─ sbbw
+	└─ widgets
+	    └─ widget_name
+	    ├─ ui
+	    │     └─ index.html
+	    ├─ autostart
+	    │      └─ *
+	    ├─ scripts
+	    │      └─ *
+	    └─ config.toml
 ```
 
 The `~` home is variable on each operative system
@@ -155,22 +170,23 @@ This is a list of commands, but this only have two parametters:
 
 ### Developing UI Javascript methods
 - executeCommand(cmd, args)
-	- This return a Promise with data as object
-	- params: 
-		- cmd: Binary or file to execute on `scripts` folder
-		- args: List of strings, where is specified the arguments for `cmd`
-	- return: Return a promise where if
-		- then: return a raw output of command
-		- catch: return an object with
-			- code: Code based on Http responses (this not related with exit code of command, is a totally refered to sbbw response), where 404 can be are a `command not found`
-			- data: this is a raw data of the output of command
+- This return a Promise with data as object
+- params: 
+        - cmd: Binary or file to execute on `scripts` folder
+        - args: List of strings, where is specified the arguments for `cmd`
+- return: Return a promise where if
+        - then: return a raw output of command
+        - catch: return an object with
+        - code: Code based on Http responses (this not related with exit code of command, is a totally refered to sbbw response), where 404 can be are a `command not found`
+        - data: this is a raw data of the output of command
 
 ### TODO
 - [ ] MacOS Stick windows Support
 - [x] Test widget (using web tools)
-- [ ] Lua support natively (For reject??)
+- [x] Lua support natively (Rejected)
+- [ ] Command to install widget easiest
+- [ ] Javascript variables, like as SO, Widget Name, and more
 - [ ] More Javascript Methods (On Demmand)
 - [ ] Implement common commands natively
 - [ ] Refactor Code
 - [ ] Your Suggestion :D
-		 
