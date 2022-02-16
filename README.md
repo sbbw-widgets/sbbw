@@ -168,9 +168,9 @@ This is a list of commands, but this only have two parametters:
 ### TODO
 - [ ] MacOS Stick windows Support
 - [x] Test widget (using web tools)
-- [ ] Lua support natively (For reject??)
+- [x] Lua support natively (Rejected)
+- [ ] Javascript variables, like as SO, Widget Name, and more
 - [ ] More Javascript Methods (On Demmand)
 - [ ] Implement common commands natively
 - [ ] Refactor Code
 - [ ] Your Suggestion :D
-		 
