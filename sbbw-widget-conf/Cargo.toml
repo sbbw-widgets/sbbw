@@ -1,6 +1,6 @@
 [package]
 name = "sbbw-widget-conf"
-version = "0.1.0"
+version = "0.1.2"
 authors = ["Sergio Ribera"]
 edition = "2021"
 
