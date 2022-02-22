@@ -365,7 +365,7 @@ async fn main() {
                     .spawn()
                     .unwrap();
                 println!("Args to test: {:?}", data);
-                subprocesses.lock().unwrap().insert(data, subprocess);
+                subprocesses.lock().unwrap().insert(data.split(" ").next().unwrap().to_string(), subprocess);
             }
             _ => {
                 println!("{}", "Unknown command".red().bold());
