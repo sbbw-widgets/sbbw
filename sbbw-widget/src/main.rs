@@ -138,19 +138,49 @@ fn main() {
                 .unwrap()
                 .with_initialization_script(
                     r#"
-document.addEventListener('contextmenu', event => event.preventDefault());
-                    const executeCommand = (command, args) => {
-                      return new Promise((resolve, reject) => {
-                          window.ipc.postMessage(JSON.stringify({ method: "exec", command, args }))
-                          document.addEventListener("sbbw-response", (e) => {
-                            let response = e.detail.response
-                            if (response.status == 200)
-                              resolve(response.data)
-                            else
-                              reject({ code: response.status, data: response.data })
-                          })
-                      })
-                    }
+(function() {
+    function Rpc() {
+        const self = this;
+        this._promises = {};
+
+        this._error = (id, error) => {
+            if(this._promises[id]){
+                this._promises[id].reject(error);
+                delete this._promises[id];
+            }
+        }
+
+        this._result = (id, result) => {
+            if(this._promises[id]){
+                if (result.status == 200)
+                    this._promises[id].resolve(result.data)
+                else
+                    this._promises[id].reject({ code: result.status, data: result.data })
+                delete this._promises[id];
+            }
+        }
+
+        this.call = function(cmd, args) {
+            let array = new Uint32Array(1);
+            window.crypto.getRandomValues(array);
+            const id = array[0];
+            const payload = {
+                method_id: id,
+                method: "exec",
+                command: cmd,
+                args,
+            };
+            const promise = new Promise((resolve, reject) => {
+                self._promises[id] = {resolve, reject};
+            });
+            window.ipc.postMessage(JSON.stringify(payload));
+            return promise;
+        }
+    }
+    window.external = window.external || {};
+    window.external.rpc = new Rpc();
+    window.rpc = window.external.rpc;
+})();
                 "#,
                 )
                 .with_ipc_handler(move |_win, msg| {
@@ -165,20 +195,15 @@ document.addEventListener('contextmenu', event => event.preventDefault());
                             response.status = StatusCode::BAD_REQUEST.as_u16();
                             response.data = "Invalid JSON sended".to_string();
                             Some(Params {
+                                method_id: 0,
                                 method: "".to_string(),
                                 command: "".to_string(),
                                 args: Vec::new(),
                             })
                         };
-                    // println!("params: {:?}", &params.as_ref().unwrap());
 
                     let method = &params.as_ref().unwrap().method;
-                    // let mut response = if &req.method == "exec-lua" {
-                    //     Some(RpcResponse::new_result(
-                    //         req.id.take(),
-                    //         Some(Value::String(exec_lua(params.unwrap(), lua))),
-                    //     ))
-                    // } else
+                    let params_clone = Some(params.as_ref().unwrap().clone());
                     if method.is_empty() {
                         response.status = StatusCode::NOT_FOUND.as_u16();
                         response.data = "Invalid command".to_string();
@@ -188,7 +213,7 @@ document.addEventListener('contextmenu', event => event.preventDefault());
                                 response.status = StatusCode::OK.as_u16();
                                 response.data = exec_command(
                                     String::from(path_scripts.to_str().unwrap()),
-                                    params.unwrap(),
+                                    params.unwrap().clone(),
                                 ).unwrap();
                             }
                         } else {
@@ -202,15 +227,11 @@ document.addEventListener('contextmenu', event => event.preventDefault());
                         let webview = webviews.as_ref().unwrap();
                         let response_json = serde_json::to_string(&response).unwrap();
                         // println!("response: {}", &response_json);
-                        let js = format!(
-                            r#"document.dispatchEvent(new CustomEvent("sbbw-response", {{ "detail": {{
-                                method: "exec",
-                                response: {}
-                            }} }}));
-                            "#,
+                        let js = format!(r#"
+window.external.rpc._result({}, {})"#,
+                            params_clone.unwrap().method_id,
                             response_json
                         );
-                        // println!("js: {}", js.as_str());
                         webview.evaluate_script(js.as_str()).unwrap();
                     });
                 })
