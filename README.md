@@ -181,6 +181,7 @@ This is a list of commands, but this only have two parametters:
         - data: this is a raw data of the output of command
 
 ### TODO
+- [ ] Sbbw daemon detect shortcuts and widgets configurable shortcuts
 - [ ] MacOS Stick windows Support
 - [x] Test widget (using web tools)
 - [x] Lua support natively (Rejected)
