@@ -12,6 +12,7 @@ use sha1::{Digest, Sha1};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Params {
+    pub method_id: i32,
     pub method: String,
     pub command: String,
     pub args: Vec<String>,
@@ -151,6 +152,7 @@ pub fn autostarts() {
                 if config_toml.autostart.len() > 0 {
                     for autostart in config_toml.autostart {
                         let params = Params {
+                            method_id: 0,
                             method: "".to_string(),
                             command: autostart.cmd.clone(),
                             args: autostart.args,
