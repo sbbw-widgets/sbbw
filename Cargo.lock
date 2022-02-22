@@ -1775,7 +1775,7 @@ checksum = "ef703b7cb59335eae2eb93ceb664c0eb7ea6bf567079d843e09420219668e072"
 
 [[package]]
 name = "sbbw"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "clap",
  "colored",
@@ -1791,7 +1791,7 @@ dependencies = [
 
 [[package]]
 name = "sbbw-exec"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "colored",
  "sbbw-widget-conf",
@@ -1802,7 +1802,7 @@ dependencies = [
 
 [[package]]
 name = "sbbw-widget"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "colored",
  "gtk",
@@ -1818,7 +1818,7 @@ dependencies = [
 
 [[package]]
 name = "sbbw-widget-conf"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "colored",
  "dirs",
