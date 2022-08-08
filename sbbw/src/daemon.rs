@@ -99,9 +99,7 @@ impl Daemon {
         println!("{}", "Daemon running".blue());
         for stream in listener.incoming() {
             match stream {
-                Ok(mut stream) => {
-                    self.handle_client(&mut stream).await
-                }
+                Ok(mut stream) => self.handle_client(&mut stream).await,
                 Err(e) => {
                     println!("[{}] {}", "Error".red().bold(), e);
                 }
@@ -129,7 +127,12 @@ impl Daemon {
     pub fn send_command(&self, client_stream: Option<TcpStream>, command: String, data: String) {
         match client_stream.as_ref() {
             Some(mut stream) => {
-                println!("{}: \"{}\" \"{}\"", "Sending command to daemon".blue().bold(), command, data);
+                println!(
+                    "{}: \"{}\" \"{}\"",
+                    "Sending command to daemon".blue().bold(),
+                    command,
+                    data
+                );
                 let data_response = format!("{}|{}", command, data);
                 stream.write(data_response.as_bytes()).unwrap();
                 stream.flush().unwrap();
