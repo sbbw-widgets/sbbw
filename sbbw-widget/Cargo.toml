@@ -24,6 +24,8 @@ sbbw-widget-conf = { path = "../sbbw-widget-conf" }
 sbbw-exec = { path = "../sbbw-exec" }
 # Tauri Plugins
 tauri-plugin-vibrancy = { git = "https://github.com/SergioRibera/tauri-plugin-vibrancy", branch = "dev", features = ["tao-impl"] }
+clap = { version = "3.2.16", features = ["color", "suggestions"] }
+sysinfo = "0.25.1"
 
 [target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
 gtk = "0.15"
