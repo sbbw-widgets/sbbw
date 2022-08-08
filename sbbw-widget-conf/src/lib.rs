@@ -4,7 +4,7 @@ use serde::{
     de::{self, Deserializer},
     Deserialize, Serialize, Serializer,
 };
-use std::{fs, path::PathBuf, collections::HashMap};
+use std::{fs, path::PathBuf};
 
 fn deserialize_widget_size<'de, D>(de: D) -> Result<WidgetSize, D::Error>
 where
@@ -59,13 +59,37 @@ pub struct AutoStartCommand {
     pub args: Vec<String>,
 }
 
-#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
-#[serde(default)]
+pub enum RpcAction {
+    Open,
+    Close,
+    Test,
+    Toggle,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+#[serde(rename_all = "lowercase")]
 pub struct RpcDataRequest {
     pub widget_name: String,
-    pub test_url: String,
-    pub widget_params: HashMap<String, String>,
+    pub action: RpcAction,
+    pub url: String,
+    pub widget_params: Option<String>,
+}
+
+impl RpcDataRequest {
+    pub fn get_args(self) -> Vec<String> {
+        let mut args = Vec::new();
+        if self.action == RpcAction::Test {
+            args.push("--test".to_string());
+        }
+        if let Some(a) = self.widget_params {
+            args.push("--args".to_string());
+            args.push(a);
+        }
+        args.push(self.url);
+        args
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
