@@ -20,8 +20,8 @@ use std::{
 };
 
 use colored::*;
+use sbbw_exec::{exec_command, Params};
 use sbbw_widget_conf::{get_widgets, get_widgets_path, WidgetSize};
-use sbbw_exec::{Params, exec_command};
 use tauri_plugin_vibrancy::Vibrancy;
 
 use wry::{
@@ -214,7 +214,8 @@ fn main() {
                                 response.data = exec_command(
                                     String::from(path_scripts.to_str().unwrap()),
                                     params.unwrap().clone(),
-                                ).unwrap();
+                                )
+                                .unwrap();
                             }
                         } else {
                             response.status = StatusCode::NOT_FOUND.as_u16();
@@ -227,7 +228,8 @@ fn main() {
                         let webview = webviews.as_ref().unwrap();
                         let response_json = serde_json::to_string(&response).unwrap();
                         // println!("response: {}", &response_json);
-                        let js = format!(r#"
+                        let js = format!(
+                            r#"
 window.external.rpc._result({}, {})"#,
                             params_clone.unwrap().method_id,
                             response_json

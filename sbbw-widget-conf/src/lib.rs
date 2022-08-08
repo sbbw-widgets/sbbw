@@ -4,7 +4,7 @@ use serde::{
     de::{self, Deserializer},
     Deserialize, Serialize, Serializer,
 };
-use std::{path::PathBuf, fs};
+use std::{fs, path::PathBuf};
 
 fn deserialize_widget_size<'de, D>(de: D) -> Result<WidgetSize, D::Error>
 where
@@ -75,7 +75,7 @@ pub struct WidgetConfig {
     pub blur: bool,
     pub always_on_top: bool,
     pub stick: bool,
-    pub autostart: Vec<AutoStartCommand>
+    pub autostart: Vec<AutoStartCommand>,
 }
 
 impl Default for WidgetConfig {
@@ -159,8 +159,6 @@ pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> 
     validate_config_from_string(&conf_str.as_str())
 }
 
-
-
 pub fn get_config_path() -> PathBuf {
     let mut path = dirs::config_dir().unwrap();
     path.push("sbbw");
@@ -175,21 +173,23 @@ pub fn get_widgets_path() -> PathBuf {
 }
 pub fn get_widgets() -> Vec<String> {
     let paths = fs::read_dir(get_widgets_path()).unwrap();
-    paths.filter_map(|path| {
-        let path = path.unwrap().path();
-        if path.is_dir() {
-            // if config file exist on folder
-            let mut config_path = path.clone();
-            config_path.push("config.toml");
-            if config_path.exists() {
-                Some(path.file_name().unwrap().to_str().unwrap().to_string())
+    paths
+        .filter_map(|path| {
+            let path = path.unwrap().path();
+            if path.is_dir() {
+                // if config file exist on folder
+                let mut config_path = path.clone();
+                config_path.push("config.toml");
+                if config_path.exists() {
+                    Some(path.file_name().unwrap().to_str().unwrap().to_string())
+                } else {
+                    None
+                }
             } else {
                 None
             }
-        } else {
-            None
-        }
-    }).collect()
+        })
+        .collect()
 }
 
 #[cfg(test)]

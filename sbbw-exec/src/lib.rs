@@ -6,7 +6,7 @@ use std::{
 };
 
 use colored::Colorize;
-use sbbw_widget_conf::{validate_config_toml, get_widgets_path};
+use sbbw_widget_conf::{get_widgets_path, validate_config_toml};
 use serde::{Deserialize, Serialize};
 use sha1::{Digest, Sha1};
 
@@ -90,7 +90,7 @@ pub fn autostarts() {
     // Iterate over all widget files in the config directory
     for entry in read_dir(config_dir).unwrap() {
         let widget_path = entry.unwrap().path();
-        let content_widget_lock= if widget_path.join("config.lock").exists() {
+        let content_widget_lock = if widget_path.join("config.lock").exists() {
             let content = std::fs::read_to_string(&widget_path.join("config.lock"));
             content
                 .unwrap()
@@ -103,10 +103,8 @@ pub fn autostarts() {
                     (key.to_string(), value.to_string())
                 })
                 .collect::<HashMap<String, String>>()
-
         } else {
-            File::create(widget_path.join("config.lock"))
-                .unwrap();
+            File::create(widget_path.join("config.lock")).unwrap();
             HashMap::<String, String>::new() // filename: hashsum content
         }; // ignore this file on gitignore
 
