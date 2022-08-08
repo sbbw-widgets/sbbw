@@ -4,7 +4,7 @@ use serde::{
     de::{self, Deserializer},
     Deserialize, Serialize, Serializer,
 };
-use std::{fs, path::PathBuf};
+use std::{fs, path::PathBuf, collections::HashMap};
 
 fn deserialize_widget_size<'de, D>(de: D) -> Result<WidgetSize, D::Error>
 where
@@ -57,6 +57,15 @@ impl Default for WidgetSize {
 pub struct AutoStartCommand {
     pub cmd: String,
     pub args: Vec<String>,
+}
+
+#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq)]
+#[serde(rename_all = "lowercase")]
+#[serde(default)]
+pub struct RpcDataRequest {
+    pub widget_name: String,
+    pub test_url: String,
+    pub widget_params: HashMap<String, String>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
