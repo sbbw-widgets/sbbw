@@ -31,23 +31,26 @@ This is a Simple and best tool for made Widgets and tools very easy with Web tec
 - more...
 ## Sbbw Usage
 ```sh
-Sbbw Daemon 0.1.0
+Sbbw Daemon 0.1.2
 Sergio Ribera
 This is the launcher and manager for the Sbbw Wigets
 
 USAGE:
-    sbbw [OPTIONS]
+    sbbw [FLAGS] [OPTIONS]
+
+FLAGS:
+    -h, --help            Prints help information
+        --no-fork
+    -s, --show-windows
+    -V, --version         Prints version information
 
 OPTIONS:
-    -c, --close <close>                        Close the widget [possible values: sidebar, bottom-bar, analog-clock]
-        --check-config <check-config>          Check config of the widget [possible values: sidebar, bottom-bar, analog-clock]
-    -h, --help                                 Print help information
-    -o, --open <open>                          Open the widget [possible values: sidebar, bottom-bar, analog-clock]
-    -p, --port <PORT>                          Port to listen on [default: 8111]
-        --show-windows                         Show all widgets installeds
-    -t, --toggle <toggle>                      Toggle view the widget [possible values: sidebar, bottom-bar, analog-clock]
-        --test <widget_name> <local_server>    Test the widget
-    -V, --version                              Print version information
+        --check-config <check-config>
+    -c, --close <close>
+    -o, --open <open>
+    -p, --port <port>                     [default: 8111]
+        --test <test>...
+    -t, --toggle <toggle>
 ```
 ## Installation
 Agnostic to platform you need download the zip with binaries on [here](https://github.com/SergioRibera/sbbw/releases) depends of your Operative System, uncompress file and continue with next steps
@@ -189,5 +192,5 @@ This is a list of commands, but this only have two parametters:
 - [ ] Javascript variables, like as SO, Widget Name, and more
 - [ ] More Javascript Methods (On Demmand)
 - [ ] Implement common commands natively
-- [ ] Refactor Code
+- [ ] Refactor Code (In Progress)
 - [ ] Your Suggestion :D
