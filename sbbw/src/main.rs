@@ -5,6 +5,7 @@ use colored::*;
 use sbbw_exec::autostarts;
 use sbbw_widget_conf::{get_widgets, get_widgets_path, validate_config_toml};
 use std::{env, process::Command};
+use fork::fork;
 use widget::routes;
 
 mod cmd;
@@ -75,6 +76,10 @@ async fn main() -> Result<(), std::io::Error> {
     }
 
     autostarts();
+
+    if !args.no_fork {
+        fork().unwrap();
+    }
 
     HttpServer::new(move || {
         App::new()
