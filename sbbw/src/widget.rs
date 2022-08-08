@@ -1,9 +1,14 @@
 #![allow(unused)]
 
 use actix_files::NamedFile;
-use actix_web::{get, web, Error, HttpRequest, Result};
+use actix_web::{
+    error, get,
+    http::StatusCode,
+    web::{self, Json},
+    Error, HttpResponse, Result,
+};
 use colored::*;
-use sbbw_widget_conf::{get_config_path, get_widgets, get_widgets_path};
+use sbbw_widget_conf::{get_config_path, get_widgets, get_widgets_path, RpcAction, RpcDataRequest};
 use serde::Deserialize;
 use std::{
     collections::HashMap,
@@ -23,12 +28,6 @@ pub fn get_state() -> &'static impl Deref<Target = Mutex<HashMap<String, Child>>
     &WIDGETS
 }
 
-#[derive(Deserialize)]
-pub struct RpcData {
-    pub widget_name: String,
-    pub widget_params: Vec<String>,
-}
-
 pub fn routes(cfg: &mut web::ServiceConfig) {
     // static files or website
     cfg.default_service(
@@ -45,23 +44,31 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                     .to_string();
                 widgets.contains(&widget_name)
             }),
-    );
+    )
     // api service
-    // .service(web::scope("/rpc").route("", web::post().to(rpc)));
+    .service(web::scope("/rpc").route("", web::post().to(rpc)));
 }
 
-// fn rpc(body: JsonBody<RpcData>) -> HttpResponse {
-//     HttpResponse::Ok()
-// }
-
-fn open_widget(key: String) -> Result<(), String> {
-    let mut widgets = get_state().lock().unwrap();
-    if !widgets.contains_key(&key) {
-        return Err("Widget {} already opened"
-            .red()
-            .replace("{}", &key.yellow().bold()));
+async fn rpc(body: Json<RpcDataRequest>) -> HttpResponse {
+    match body.action {
+        RpcAction::Open => open_widget(body).await,
+        RpcAction::Close => close_widget(body).await,
+        RpcAction::Toggle => toggle_widget(body).await,
+        RpcAction::Test => toggle_widget(body).await,
+        _ => HttpResponse::BadRequest().finish(),
     }
-    println!("Open: {:?}", key);
+}
+
+async fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
+    let mut widgets = get_state().lock().unwrap();
+    if !widgets.contains_key(&data.widget_name) {
+        return HttpResponse::build(StatusCode::UNAUTHORIZED).body(
+            "Widget {} already opened"
+                .red()
+                .replace("{}", &data.widget_name.yellow().bold()),
+        );
+    }
+    println!("Open: {:?}", data.widget_name);
     let file = OpenOptions::new()
         .append(true)
         .create(true)
@@ -70,36 +77,38 @@ fn open_widget(key: String) -> Result<(), String> {
 
     let out = Stdio::from(file);
     let subprocess = Command::new("sbbw-widget")
-        .args(key.split_whitespace())
+        .args(data.clone().get_args())
         .stderr(out)
         .spawn()
         .unwrap();
-    widgets.insert(key, subprocess);
-    Ok(())
+    widgets.insert(data.widget_name.clone(), subprocess);
+    HttpResponse::Ok().finish()
 }
 
-fn close_widget(key: String) -> Result<(), String> {
+async fn close_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let mut widgets = get_state().lock().unwrap();
 
-    if !widgets.contains_key(&key) {
-        return Err("Widget {} not running"
-            .red()
-            .replace("{}", &key.yellow().bold()));
+    if !widgets.contains_key(&data.widget_name) {
+        return HttpResponse::build(StatusCode::BAD_GATEWAY).body(
+            "Widget {} not running"
+                .red()
+                .replace("{}", &data.widget_name.yellow().bold()),
+        );
     }
-    println!("Close: {:?}", key);
-    if let Some(mut subprocess) = widgets.remove(&key) {
+    println!("Close: {:?}", data.widget_name);
+    if let Some(mut subprocess) = widgets.remove(&data.widget_name) {
         subprocess.kill().unwrap();
         drop(subprocess);
     }
-    Ok(())
+    HttpResponse::Ok().finish()
 }
 
-fn toggle_widget(key: String) -> Result<(), String> {
+async fn toggle_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let widgets = get_state().lock().unwrap();
-    if !widgets.contains_key(&key) {
-        open_widget(key)
+    if !widgets.contains_key(&data.widget_name) {
+        open_widget(data).await
     } else {
-        close_widget(key)
+        close_widget(data).await
     }
 }
 

@@ -2,14 +2,13 @@
 use actix_web::{App, HttpServer};
 use cmd::get_args;
 use colored::*;
+use fork::fork;
 use sbbw_exec::autostarts;
 use sbbw_widget_conf::{get_widgets, get_widgets_path, validate_config_toml};
 use std::{env, process::Command};
-use fork::fork;
 use widget::routes;
 
 mod cmd;
-mod daemon;
 mod widget;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -35,23 +34,26 @@ async fn main() -> Result<(), std::io::Error> {
         if widgets.contains(&value.clone()) {
             let path_conf = get_widgets_path().join(value).join("config.toml");
             if path_conf.exists() {
-                if validate_config_toml(path_conf).is_err() {
-                    println!(
-                        "{}",
-                        "Config of widget {} is not valid"
-                            .red()
-                            .replace("{}", &value.yellow().bold())
-                    );
-                    return Ok(());
-                } else {
-                    println!(
-                        "{}",
-                        "Config of widget {} is valid"
-                            .green()
-                            .replace("{}", &value.yellow().bold())
-                    );
-                    return Ok(());
+                match validate_config_toml(path_conf) {
+                    Ok(_) => {
+                        println!(
+                            "{}",
+                            "Config of widget {} is valid"
+                                .green()
+                                .replace("{}", &value.yellow().bold())
+                        );
+                    }
+                    Err(e) => {
+                        println!("{e}");
+                        println!(
+                            "{}",
+                            "Config of widget {} is not valid"
+                                .red()
+                                .replace("{}", &value.yellow().bold())
+                        );
+                    }
                 }
+                return Ok(());
             }
         }
         println!(
@@ -64,7 +66,10 @@ async fn main() -> Result<(), std::io::Error> {
     }
 
     match Command::new("sbbw-widget").spawn() {
-        Ok(_) => println!("{}", "Binary for launch Widgets alredy exists".green()),
+        Ok(mut c) => {
+            c.kill().unwrap();
+            drop(c);
+        }
         Err(e) => {
             println!(
                 "{} reason: {:?}",
@@ -81,14 +86,10 @@ async fn main() -> Result<(), std::io::Error> {
         fork().unwrap();
     }
 
-    HttpServer::new(move || {
-        App::new()
-            // .wrap(Logger::default())
-            // .wrap(Logger::new("%a %{User-Agent}i"))
-            .configure(routes)
-    })
-    .bind(("0.0.0.0", args.port))
-    .unwrap()
-    .run()
-    .await
+    HttpServer::new(move || App::new().configure(routes))
+        .bind(("0.0.0.0", args.port))
+        .unwrap()
+        .workers(4)
+        .run()
+        .await
 }
