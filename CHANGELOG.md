@@ -1,7 +1,10 @@
 ### Features
-- Add setup scripts for easy installation
+- Install command (only if hosted in git repository)
+- New daemon comunication
+- Fork process to background
 
 ### Refactor
-- Remove all lua dependencies
+- New arguments on cli
+- Replace structopts to native clap
 
 ### TODO

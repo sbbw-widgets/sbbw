@@ -188,7 +188,7 @@ This is a list of commands, but this only have two parametters:
 - [ ] MacOS Stick windows Support
 - [x] Test widget (using web tools)
 - [x] Lua support natively (Rejected)
-- [ ] Command to install widget easiest
+- [x] Command to install widget easiest
 - [ ] Javascript variables, like as SO, Widget Name, and more
 - [ ] More Javascript Methods (On Demmand)
 - [ ] Implement common commands natively

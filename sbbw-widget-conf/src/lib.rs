@@ -54,6 +54,23 @@ impl Default for WidgetSize {
 #[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
 #[serde(default)]
+pub struct KeyboardShortcuts {
+    pub special: String,
+    pub key: String,
+    pub widget: String,
+}
+
+#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq)]
+#[serde(rename_all = "lowercase")]
+#[serde(default)]
+pub struct SbbwConfig {
+    pub port: u16,
+    pub shortcuts: Vec<KeyboardShortcuts>,
+}
+
+#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq)]
+#[serde(rename_all = "lowercase")]
+#[serde(default)]
 pub struct AutoStartCommand {
     pub cmd: String,
     pub args: Vec<String>,
@@ -180,6 +197,15 @@ fn validate_config_from_string(config: &str) -> Result<WidgetConfig, String> {
         )),
     }
 }
+pub fn exits_widget(widget_name: String) -> bool {
+    let widgets = get_widgets();
+    let exists = widgets.contains(&widget_name);
+    if exists {
+        let path_conf = get_widgets_path().join(widget_name).join("config.toml");
+        return path_conf.exists();
+    }
+    false
+}
 pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> {
     if !conf_path.exists() {
         return Err(format!(
@@ -190,6 +216,41 @@ pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> 
     }
     let conf_str = std::fs::read_to_string(conf_path).unwrap();
     validate_config_from_string(&conf_str.as_str())
+}
+
+pub fn get_pid() -> std::io::Result<String> {
+    let mut config = get_config_path();
+    config.push("pid");
+
+    fs::read_to_string(config)
+}
+
+pub fn generate_pid_file(pid: String) -> bool {
+    let mut config = get_config_path();
+    config.push("pid");
+
+    match fs::write(config.to_str().unwrap(), pid.as_str()) {
+        Ok(_) => true,
+        Err(_) => false
+    }
+}
+
+pub fn generate_config_sbbw(cfg: SbbwConfig) -> Result<(), std::io::Error> {
+    let mut path = dirs::config_dir().unwrap();
+    path.push("config.toml");
+
+    fs::write(path.to_str().unwrap(), toml::to_string(&cfg).unwrap().as_str())
+}
+
+pub fn get_config_sbbw() -> Result<SbbwConfig, String> {
+    let mut path = dirs::config_dir().unwrap();
+    path.push("config.toml");
+
+    let raw_str = fs::read_to_string(path.to_str().unwrap()).unwrap_or_default();
+    match toml::from_str::<SbbwConfig>(raw_str.as_str()) {
+        Ok(data) => Ok(data),
+        Err(e) => Err(e.to_string())
+    }
 }
 
 pub fn get_config_path() -> PathBuf {

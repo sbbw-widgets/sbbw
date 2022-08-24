@@ -50,6 +50,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 }
 
 async fn rpc(body: Json<RpcDataRequest>) -> HttpResponse {
+    println!("Data received: {:?}", &body);
     match body.action {
         RpcAction::Open => open_widget(body).await,
         RpcAction::Close => close_widget(body).await,
@@ -61,7 +62,8 @@ async fn rpc(body: Json<RpcDataRequest>) -> HttpResponse {
 
 async fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let mut widgets = get_state().lock().unwrap();
-    if !widgets.contains_key(&data.widget_name) {
+    println!("Widgets openned: {:?}", widgets);
+    if widgets.contains_key(&data.widget_name) {
         return HttpResponse::build(StatusCode::UNAUTHORIZED).body(
             "Widget {} already opened"
                 .red()
@@ -76,13 +78,17 @@ async fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
         .unwrap();
 
     let out = Stdio::from(file);
-    let subprocess = Command::new("sbbw-widget")
+    match Command::new("sbbw-widget")
         .args(data.clone().get_args())
         .stderr(out)
         .spawn()
-        .unwrap();
-    widgets.insert(data.widget_name.clone(), subprocess);
-    HttpResponse::Ok().finish()
+    {
+        Ok(subprocess) => {
+            widgets.insert(data.widget_name.clone(), subprocess);
+            HttpResponse::Ok().finish()
+        }
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
 }
 
 async fn close_widget(data: Json<RpcDataRequest>) -> HttpResponse {
