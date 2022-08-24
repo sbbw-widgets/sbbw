@@ -1,16 +1,12 @@
 [package]
 name = "sbbw-widget"
 version = "0.1.2"
-description = "A Tauri window to show Widget"
+description = "A binary to show Widget as Window"
 authors = ["Sergio Ribera"]
 license = ""
 repository = "https://github.com/SergioRibera/sbbw"
 default-run = "sbbw-widget"
 edition = "2021"
-# build = "src/build.rs"
-
-# [build-dependencies]
-# tauri-build = { version = "1.0.0-beta.4" }
 
 [dependencies]
 serde_json = "1.0"
@@ -19,17 +15,12 @@ url = "2.2"
 wry = { version = "0.13.0", features = ["protocol", "devtool", "transparent"]}
 serde = { version = "1.0", features = ["derive"] }
 tao = { version = "0.6.1", default-features = false, features = [ "serde" ] }
-# tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next", features = ["api-all"] }
 sbbw-widget-conf = { path = "../sbbw-widget-conf" }
 sbbw-exec = { path = "../sbbw-exec" }
 # Tauri Plugins
 tauri-plugin-vibrancy = { git = "https://github.com/SergioRibera/tauri-plugin-vibrancy", branch = "dev", features = ["tao-impl"] }
-clap = { version = "3.2.17", features = ["color", "suggestions"] }
+clap = { version = "3.2.17", features = ["color", "suggestions", "derive"] }
 sysinfo = "0.25.1"
 
 [target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
 gtk = "0.15"
-
-# [features]
-# default = [ "custom-protocol" ]
-# custom-protocol = [ "tauri/custom-protocol" ]
