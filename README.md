@@ -31,26 +31,29 @@ This is a Simple and best tool for made Widgets and tools very easy with Web tec
 - more...
 ## Sbbw Usage
 ```sh
-Sbbw Daemon 0.1.2
+sbbw 0.1.2
 Sergio Ribera
 This is the launcher and manager for the Sbbw Wigets
 
 USAGE:
-    sbbw [FLAGS] [OPTIONS]
-
-FLAGS:
-    -h, --help            Prints help information
-        --no-fork
-    -s, --show-windows
-    -V, --version         Prints version information
+    sbbw [OPTIONS] [SUBCOMMAND]
 
 OPTIONS:
-        --check-config <check-config>
-    -c, --close <close>
-    -o, --open <open>
-    -p, --port <port>                     [default: 8111]
-        --test <test>...
-    -t, --toggle <toggle>
+    -h, --help            Print help information
+        --no-fork
+    -p, --port <PORT>     [default: 8111]
+    -s, --show-windows
+    -V, --version         Print version information
+
+SUBCOMMANDS:
+    check
+    close
+    help       Print this message or the help of the given subcommand(s)
+    install
+    open
+    run
+    test
+    toggle
 ```
 ## Installation
 Agnostic to platform you need download the zip with binaries on [here](https://github.com/SergioRibera/sbbw/releases) depends of your Operative System, uncompress file and continue with next steps
