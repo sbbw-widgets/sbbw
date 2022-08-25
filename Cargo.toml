@@ -2,7 +2,6 @@
 members = [
     "sbbw",
     "sbbw-exec",
-    "sbbw-macro",
     "sbbw-widget-conf",
     "sbbw-widget",
 ]
