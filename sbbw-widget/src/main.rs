@@ -58,20 +58,6 @@ fn main() {
         let url_ui = args.url.clone();
         let widget_conf_clone = widget_conf.clone();
 
-        // let widget_scripts_vec: Vec<String> = fs::read_dir(path_scripts)
-        //     .unwrap()
-        //     .filter_map(|path| {
-        //         let path = path.unwrap().path();
-        //         if !path.is_dir() {
-        //             Some(String::from(
-        //                 fs::canonicalize(path).unwrap().to_str().unwrap(),
-        //             ))
-        //         } else {
-        //             None
-        //         }
-        //     })
-        //     .collect();
-
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
             .with_decorations(false)
