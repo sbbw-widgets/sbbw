@@ -3,7 +3,7 @@
 pub mod base;
 pub mod bat;
 pub mod initial;
-pub mod sysinfo;
+pub mod sys_info;
 pub mod widget;
 
 use std::collections::HashMap;
@@ -19,13 +19,15 @@ pub struct SbbwResponse {
     pub data: String,
 }
 
-pub type MethodActions = HashMap<&'static str, Box<dyn Fn(&Window, String, &Params) -> SbbwResponse>>;
+pub type MethodActions =
+    HashMap<&'static str, Box<dyn Fn(&Window, String, &Params) -> SbbwResponse>>;
 
 fn get_actions() -> MethodActions {
     let mut actions = MethodActions::new();
 
     base::register(&mut actions);
     bat::register(&mut actions);
+    sys_info::register(&mut actions);
 
     actions
 }
