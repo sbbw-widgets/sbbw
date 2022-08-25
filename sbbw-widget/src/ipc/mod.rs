@@ -28,6 +28,7 @@ fn get_actions() -> MethodActions {
     base::register(&mut actions);
     bat::register(&mut actions);
     sys_info::register(&mut actions);
+    widget::register(&mut actions);
 
     actions
 }
