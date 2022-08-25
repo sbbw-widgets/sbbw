@@ -115,7 +115,7 @@ fn main() {
                 let params: Option<Params> = parse_params(&mut response, msg);
 
                 if response.status != 0 {
-                    response = process_ipc(win, widget_name.clone(), params.unwrap());
+                    response = process_ipc(win, widget_name.clone(), &params.as_ref().unwrap());
                 }
                 WEBVIEWS.with(|ref_webview| {
                     let webviews = ref_webview.borrow();

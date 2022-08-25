@@ -45,12 +45,12 @@ pub fn parse_params(res: &mut SbbwResponse, msg: String) -> Option<Params> {
     }
 }
 
-pub fn process_ipc(win: &Window, widget_name: String, params: Params) -> SbbwResponse {
+pub fn process_ipc(win: &Window, widget_name: String, params: &Params) -> SbbwResponse {
     let methods = get_actions();
     let mut res = SbbwResponse::default();
 
-    if let Some(f) = methods.get(&params.method.as_str()) {
-        res = f(win, widget_name, &params);
+    if let Some(f) = methods.get(params.method.as_str()) {
+        res = f(win, widget_name, params);
     } else {
         res.status = StatusCode::NOT_FOUND.as_u16();
         res.data = "Invalid command".to_string();
