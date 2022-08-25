@@ -25,6 +25,7 @@ fn get_actions() -> MethodActions {
     let mut actions = MethodActions::new();
 
     base::register(&mut actions);
+    bat::register(&mut actions);
 
     actions
 }
