@@ -1,3 +1,9 @@
+import * as sbbw from './sbbw';
+import * as battery from './api/bat';
+import * as base from './api/base';
+import * as sysinfo from './api/sysinfo';
+import * as widget from './api/widget';
+
 export type SbbwGeneral = {
     /**
      * Describe the specific operating system in use, based on [rust doc](https://doc.rust-lang.org/std/env/consts/constant.OS.html)
@@ -15,5 +21,10 @@ const general: SbbwGeneral = {
 }
 
 export {
+    sbbw,
     general,
+    battery,
+    base,
+    sysinfo,
+    widget
 }
