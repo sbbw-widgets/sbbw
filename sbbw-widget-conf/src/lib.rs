@@ -104,6 +104,8 @@ impl RpcDataRequest {
             args.push("--args".to_string());
             args.push(a);
         }
+        args.push("--widget-name".to_string());
+        args.push(self.widget_name);
         args.push(self.url);
         args
     }
