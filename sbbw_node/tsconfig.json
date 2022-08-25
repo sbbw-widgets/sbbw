@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "allowJs": true,
+        "esModuleInterop": true,
+        "baseUrl": ".",
+        "paths": {
+            "types": [
+                "@types"
+            ]
+        },
+        "declaration": true,
+        "declarationDir": "dist",
+        "rootDir": "src",
+        "moduleResolution": "node"
+    },
+    "include": [
+        "./src"
+    ]
+}
