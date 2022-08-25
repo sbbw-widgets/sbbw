@@ -1,0 +1,5 @@
+*.log
+babel.config.js
+rollup.config.js
+tsconfig.js
+src/
