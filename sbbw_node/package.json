@@ -1,0 +1,17 @@
+{
+    "name": "@sbbw/api",
+    "version": "0.01",
+    "description": "Types for create widgets using sbbw",
+    "main": "index.ts",
+    "repository": "https://github.com/SergioRibera/sbbw",
+    "author": "SergioRibera",
+    "license": "MIT",
+    "type": "module",
+    "bugs": {
+        "url": "https://github.com/SergioRibera/sbbw/issues"
+    },
+    "homepage": "https://github.com/SergioRibera/sbbw#readme",
+    "devDependencies": {
+        "typescript": "^4.7.4"
+    }
+}
