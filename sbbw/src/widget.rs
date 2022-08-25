@@ -52,15 +52,15 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 async fn rpc(body: Json<RpcDataRequest>) -> HttpResponse {
     println!("Data received: {:?}", &body);
     match body.action {
-        RpcAction::Open => open_widget(body).await,
-        RpcAction::Close => close_widget(body).await,
+        RpcAction::Open => open_widget(body),
+        RpcAction::Close => close_widget(body),
         RpcAction::Toggle => toggle_widget(body).await,
-        RpcAction::Test => toggle_widget(body).await,
+        RpcAction::Test => open_widget(body),
         _ => HttpResponse::BadRequest().finish(),
     }
 }
 
-async fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
+fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let mut widgets = get_state().lock().unwrap();
     println!("Widgets openned: {:?}", widgets);
     if widgets.contains_key(&data.widget_name) {
@@ -91,7 +91,7 @@ async fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     }
 }
 
-async fn close_widget(data: Json<RpcDataRequest>) -> HttpResponse {
+fn close_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let mut widgets = get_state().lock().unwrap();
 
     if !widgets.contains_key(&data.widget_name) {
@@ -112,9 +112,9 @@ async fn close_widget(data: Json<RpcDataRequest>) -> HttpResponse {
 async fn toggle_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let widgets = get_state().lock().unwrap();
     if !widgets.contains_key(&data.widget_name) {
-        open_widget(data).await
+        open_widget(data)
     } else {
-        close_widget(data).await
+        close_widget(data)
     }
 }
 

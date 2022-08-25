@@ -34,14 +34,19 @@ fn get_actions() -> MethodActions {
 }
 
 pub fn parse_params(res: &mut SbbwResponse, msg: String) -> Option<Params> {
-    if let Ok(params) = serde_json::from_str(msg.as_str()) {
-        res.status = StatusCode::OK.as_u16();
-        res.data = "".to_string();
-        Some(params)
-    } else {
-        res.status = StatusCode::BAD_REQUEST.as_u16();
-        res.data = "Invalid JSON sended".to_string();
-        None
+    println!("{}", &msg);
+    match serde_json::from_str::<Params>(msg.as_str()) {
+        Ok(params) => {
+            res.status = StatusCode::OK.as_u16();
+            res.data = "".to_string();
+            Some(params)
+        }
+        Err(e) => {
+            println!("{e}");
+            res.status = StatusCode::BAD_REQUEST.as_u16();
+            res.data = "Invalid JSON sended".to_string();
+            None
+        }
     }
 }
 

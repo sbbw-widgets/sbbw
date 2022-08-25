@@ -8,8 +8,8 @@ use colored::*;
 use fork::{fork, Fork};
 use sbbw_exec::autostarts;
 use sbbw_widget_conf::{
-    exits_widget, generate_config_sbbw, generate_pid_file, get_config_sbbw, get_widgets,
-    get_widgets_path, validate_config_toml, SbbwConfig, get_pid,
+    exits_widget, generate_config_sbbw, generate_pid_file, get_config_sbbw, get_pid, get_widgets,
+    get_widgets_path, remove_pid_file, validate_config_toml, SbbwConfig,
 };
 use std::{env, process::Command};
 use widget::routes;
@@ -55,7 +55,7 @@ fn main() {
 
         match cmd {
             WidgetCommands::Run => {
-                if get_pid().is_err() {
+                if !get_pid().is_err() {
                     println!("{}", "Other Sbbw Daemon is running".red().bold());
                     std::process::exit(1);
                 }
@@ -83,8 +83,11 @@ fn main() {
                     .workers(4)
                     .run();
                 match actix_rt::System::new().block_on(server) {
-                    Ok(_) => println!("Done"), // Call when the server is closed
-                    Err(e) => println!("Error: {}", e),
+                    Ok(_) => remove_pid_file(), // Call when the server is closed
+                    Err(e) => {
+                        remove_pid_file();
+                        println!("Error: {}", e)
+                    }
                 }
             }
             WidgetCommands::Check { widget_name } => {
@@ -136,8 +139,10 @@ fn main() {
                         Ok(res) => {
                             if !res.status().is_success() {
                                 println!("Cannot comunicate with daemon");
+                            } else {
+                                std::process::exit(1);
                             }
-                        },
+                        }
                         Err(e) => println!("Error calling daemon: {}", e),
                     }
                 }

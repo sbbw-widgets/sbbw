@@ -237,6 +237,13 @@ pub fn generate_pid_file(pid: String) -> bool {
     }
 }
 
+pub fn remove_pid_file() {
+    let mut config = get_config_path();
+    config.push("pid");
+
+    fs::remove_file(config).unwrap()
+}
+
 pub fn generate_config_sbbw(cfg: SbbwConfig) -> Result<(), std::io::Error> {
     let mut path = dirs::config_dir().unwrap();
     path.push("config.toml");

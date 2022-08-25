@@ -12,7 +12,7 @@ use sha1::{Digest, Sha1};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Params {
-    pub method_id: i32,
+    pub method_id: isize,
     pub method: String,
     pub args: Vec<String>,
 }
