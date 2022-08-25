@@ -1,53 +1,56 @@
-const INITIAL_SCRIPT: &'static str = r#"
-(function() {
-function Rpc() {
-    const self = this;
-    this._promises = {};
+#![allow(dead_code)]
 
-    this._error = (id, error) => {
-        if(this._promises[id]){
-            this._promises[id].reject(error);
-            delete this._promises[id];
-        }
-    }
+pub mod base;
+pub mod bat;
+pub mod initial;
+pub mod sysinfo;
+pub mod widget;
 
-    this._result = (id, result) => {
-        if(this._promises[id]){
-            if (result.status == 200)
-                this._promises[id].resolve(result.data)
-            else
-                this._promises[id].reject({ code: result.status, data: result.data })
-            delete this._promises[id];
-        }
-    }
+use std::collections::HashMap;
 
-    this.call = function(cmd, args) {
-        let array = new Uint32Array(1);
-        window.crypto.getRandomValues(array);
-        const id = array[0];
-        const payload = {
-            method_id: id,
-            method: "exec",
-            command: cmd,
-            args,
-        };
-        const promise = new Promise((resolve, reject) => {
-            self._promises[id] = {resolve, reject};
-        });
-        window.ipc.postMessage(JSON.stringify(payload));
-        return promise;
+use sbbw_exec::Params;
+use serde::{Deserialize, Serialize};
+use tao::window::Window;
+use wry::http::status::StatusCode;
+
+#[derive(Default, Deserialize, Serialize)]
+pub struct SbbwResponse {
+    pub status: u16,
+    pub data: String,
+}
+
+pub type MethodActions = HashMap<&'static str, Box<dyn Fn(&Window, String, &Params) -> SbbwResponse>>;
+
+fn get_actions() -> MethodActions {
+    let mut actions = MethodActions::new();
+
+    base::register(&mut actions);
+
+    actions
+}
+
+pub fn parse_params(res: &mut SbbwResponse, msg: String) -> Option<Params> {
+    if let Ok(params) = serde_json::from_str(msg.as_str()) {
+        res.status = StatusCode::OK.as_u16();
+        res.data = "".to_string();
+        Some(params)
+    } else {
+        res.status = StatusCode::BAD_REQUEST.as_u16();
+        res.data = "Invalid JSON sended".to_string();
+        None
     }
 }
-window.external = window.external || {};
-window.external.rpc = new Rpc();
-window.rpc = window.external.rpc;
-##OTHER_VARIABLES##
-})();"#;
 
-pub fn get_initial_js() -> String {
-    let base = INITIAL_SCRIPT.to_string();
-    let mut others = String::new();
-    others.push_str(format!("window.general.os = \"{}\";", std::env::consts::OS).as_str());
-    others.push_str(format!("window.general.os_arch = \"{}\";", std::env::consts::ARCH).as_str());
-    base.replace("##OTHER_VARIABLES##", &others)
+pub fn process_ipc(win: &Window, widget_name: String, params: Params) -> SbbwResponse {
+    let methods = get_actions();
+    let mut res = SbbwResponse::default();
+
+    if let Some(f) = methods.get(&params.method.as_str()) {
+        res = f(win, widget_name, &params);
+    } else {
+        res.status = StatusCode::NOT_FOUND.as_u16();
+        res.data = "Invalid command".to_string();
+    }
+
+    res
 }

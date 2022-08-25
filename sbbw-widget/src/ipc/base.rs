@@ -1,0 +1,28 @@
+use sbbw_exec::{exec_command, Params};
+use sbbw_widget_conf::get_widgets_path;
+use tao::window::Window;
+use wry::http::status::StatusCode;
+
+use super::{MethodActions, SbbwResponse};
+
+pub fn register(action: &mut MethodActions) {
+    action.insert("exec", Box::new(exec));
+}
+
+pub fn exec(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+    let mut res = SbbwResponse::default();
+    let path_scripts = get_widgets_path().join(&name).join("scripts");
+
+    match exec_command(String::from(path_scripts.to_str().unwrap()), params.clone()) {
+        Ok(data) => {
+            res.status = StatusCode::OK.as_u16();
+            res.data = data;
+        }
+        Err(_) => {
+            res.status = StatusCode::EXPECTATION_FAILED.as_u16();
+            res.data = "Failed to excecute command".to_string();
+        }
+    }
+
+    res
+}

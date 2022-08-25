@@ -5,8 +5,8 @@
     windows_subsystem = "windows"
 )]
 mod cmd;
-mod ipc;
 mod exts;
+mod ipc;
 
 use clap::Parser;
 use cmd::Args;
@@ -45,13 +45,7 @@ use wry::{
     Value,
 };
 
-use crate::ipc::get_initial_js;
-
-#[derive(Serialize)]
-struct SbbwResponse {
-    pub status: u16,
-    pub data: String,
-}
+use crate::ipc::{initial::get_initial_js, process_ipc, SbbwResponse, parse_params};
 
 fn main() {
     let args = Args::parse();
@@ -60,7 +54,6 @@ fn main() {
     if widgets.contains(&args.widget_name) {
         let widget_name = args.widget_name.clone();
         let path_to_widget_conf = get_widgets_path().join(&widget_name).join("config.toml");
-        let path_scripts = get_widgets_path().join(&widget_name).join("scripts");
         let widget_conf = sbbw_widget_conf::validate_config_toml(path_to_widget_conf).unwrap();
         let url_ui = args.url.clone();
         let widget_conf_clone = widget_conf.clone();
@@ -131,45 +124,12 @@ fn main() {
             .with_url(&url_ui)
             .unwrap()
             .with_initialization_script(get_initial_js().as_str())
-            .with_ipc_handler(move |_win, msg| {
-                let mut response = SbbwResponse {
-                    status: StatusCode::OK.as_u16(),
-                    data: "{}".to_string(),
-                };
-                let params: Option<Params> =
-                    if let Ok(params) = serde_json::from_str(msg.as_str()) {
-                        Some(params)
-                    } else {
-                        response.status = StatusCode::BAD_REQUEST.as_u16();
-                        response.data = "Invalid JSON sended".to_string();
-                        Some(Params {
-                            method_id: 0,
-                            method: "".to_string(),
-                            command: "".to_string(),
-                            args: Vec::new(),
-                        })
-                    };
+            .with_ipc_handler(move |win, msg| {
+                let mut response = SbbwResponse::default();
+                let params: Option<Params> = parse_params(&mut response, msg);
 
-                let method = &params.as_ref().unwrap().method;
-                let params_clone = Some(params.as_ref().unwrap().clone());
-                if method.is_empty() {
-                    response.status = StatusCode::NOT_FOUND.as_u16();
-                    response.data = "Invalid command".to_string();
-                } else {
-                    if method.trim().eq("exec") {
-                        if response.status == StatusCode::OK {
-                            response.status = StatusCode::OK.as_u16();
-                            response.data = exec_command(
-                                String::from(path_scripts.to_str().unwrap()),
-                                params.unwrap().clone(),
-                            )
-                            .unwrap();
-                        }
-                    } else {
-                        response.status = StatusCode::NOT_FOUND.as_u16();
-                        response.data =
-                            format!("Command \"{}\" not found", &method).to_string();
-                    };
+                if response.status != 0 {
+                    response = process_ipc(win, widget_name.clone(), params.unwrap());
                 }
                 WEBVIEWS.with(|ref_webview| {
                     let webviews = ref_webview.borrow();
@@ -179,8 +139,7 @@ fn main() {
                     let js = format!(
                         r#"
 window.external.rpc._result({}, {})"#,
-                        params_clone.unwrap().method_id,
-                        response_json
+                        params.unwrap().method_id, response_json
                     );
                     webview.evaluate_script(js.as_str()).unwrap();
                 });
