@@ -21,14 +21,13 @@ function Rpc() {
         }
     }
 
-    this.call = function(cmd, args) {
+    this.call = function(method, args) {
         let array = new Uint32Array(1);
         window.crypto.getRandomValues(array);
         const id = array[0];
         const payload = {
             method_id: id,
-            method: "exec",
-            command: cmd,
+            method: method,
             args,
         };
         const promise = new Promise((resolve, reject) => {

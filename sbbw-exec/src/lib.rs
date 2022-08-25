@@ -14,7 +14,6 @@ use sha1::{Digest, Sha1};
 pub struct Params {
     pub method_id: i32,
     pub method: String,
-    pub command: String,
     pub args: Vec<String>,
 }
 
@@ -33,9 +32,9 @@ fn generate_hash_from_file(path: PathBuf) -> Result<String, Box<dyn Error>> {
 }
 
 pub fn exec_command(pwd: String, params: Params) -> Result<String, String> {
-    let file = params.command;
+    let file = params.args.first().expect("The arguments cannot by empty");
     println!("{}", file);
-    let mut args = params.args;
+    let mut args = params.args[1..].to_vec();
     if file.starts_with("./") {
         args.insert(0, file.clone());
     }
@@ -149,11 +148,14 @@ pub fn autostarts() {
 
                 if config_toml.autostart.len() > 0 {
                     for autostart in config_toml.autostart {
+                        let mut args = Vec::new();
+                        args.push(autostart.cmd.to_string());
+                        args.extend(autostart.args);
+
                         let params = Params {
                             method_id: 0,
                             method: "".to_string(),
-                            command: autostart.cmd.clone(),
-                            args: autostart.args,
+                            args,
                         };
                         if !autostart.cmd.contains(".lua") {
                             match exec_command(

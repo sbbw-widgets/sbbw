@@ -27,7 +27,7 @@ struct SbbwDisk {
     pub file_system: String,
 }
 
-fn disks(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+fn disks(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_with_specifics(RefreshKind::new().with_disks());
 
@@ -67,7 +67,7 @@ struct SbbwNetwork {
     pub total_errors_on_transmitted: u64,
 }
 
-fn network(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+fn network(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_with_specifics(RefreshKind::new().with_networks());
 
@@ -115,7 +115,7 @@ struct SbbwInfo {
     pub users: Vec<SbbwInfoUser>,
 }
 
-fn info(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+fn info(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_with_specifics(RefreshKind::new().with_users_list());
 
@@ -154,7 +154,7 @@ struct SbbwMemory {
     pub swap_used: u64,
 }
 
-fn memory(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+fn memory(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_all();
 
@@ -183,7 +183,7 @@ struct SbbwCpu {
     pub frequency: u64,
 }
 
-fn cpu(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+fn cpu(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_all();
 
