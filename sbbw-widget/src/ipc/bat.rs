@@ -32,7 +32,7 @@ pub fn register(action: &mut MethodActions) {
     action.insert("battery.main", Box::new(main_batery));
 }
 
-fn batery_counts(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+fn batery_counts(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
 
     match Manager::new() {
@@ -55,7 +55,7 @@ fn batery_counts(_win: &Window, name: String, params: &Params) -> SbbwResponse {
     res
 }
 
-fn bateries(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+fn bateries(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
 
     match Manager::new() {
@@ -99,12 +99,12 @@ fn bateries(_win: &Window, name: String, params: &Params) -> SbbwResponse {
     res
 }
 
-fn main_batery(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+fn main_batery(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
 
     match Manager::new() {
         Ok(manager) => match manager.batteries() {
-            Ok(bats) => {
+            Ok(mut bats) => {
                 let b = bats.next().unwrap().unwrap();
                 let bat = SbbwBattery {
                     vendor: b.vendor().unwrap_or("").to_string(),
