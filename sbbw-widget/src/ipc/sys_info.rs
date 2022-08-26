@@ -30,7 +30,8 @@ struct SbbwDisk {
 
 fn disks(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    let sys = System::new_with_specifics(RefreshKind::new().with_disks());
+    let mut sys = System::new_all();
+    sys.refresh_disks();
     trace!("Request disk list");
 
     let disks = sys
@@ -71,7 +72,8 @@ struct SbbwNetwork {
 
 fn network(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    let sys = System::new_with_specifics(RefreshKind::new().with_networks());
+    let mut sys = System::new_all();
+    sys.refresh_networks();
     trace!("Request Network interface list");
 
     let nets = sys
