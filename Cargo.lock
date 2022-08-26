@@ -487,6 +487,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "clap-verbosity-flag"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0636f9c040082f8e161555a305f8cec1a1c2828b3d981c812b8c39f4ac00c42c"
+dependencies = [
+ "clap",
+ "log",
+]
+
+[[package]]
 name = "clap_derive"
 version = "3.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -820,6 +830,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9852635589dc9f9ea1b6fe9f05b50ef208c85c834a562f0c6abb1c475736ec2b"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "env_logger"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b2cf0344971ee6c64c31be0d530793fba457d322dfec2810c453d0ef228f9c3"
+dependencies = [
+ "atty",
+ "humantime",
+ "log",
+ "regex",
+ "termcolor",
 ]
 
 [[package]]
@@ -1354,6 +1377,12 @@ name = "httpdate"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4a1e36c821dbe04574f602848a19f742f4fb3c98d40449f11bcad18d6b17421"
+
+[[package]]
+name = "humantime"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a3a5bfb195931eeb336b2a7b4d761daec841b97f947d34394601737a7bba5e4"
 
 [[package]]
 name = "hyper"
@@ -2225,12 +2254,15 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "clap",
+ "clap-verbosity-flag",
  "colored",
+ "env_logger",
  "fork",
  "futures 0.3.23",
  "git2",
  "indicatif",
  "lazy_static",
+ "log",
  "reqwest",
  "sbbw-exec",
  "sbbw-widget-conf",
@@ -2258,7 +2290,9 @@ dependencies = [
  "battery",
  "clap",
  "colored",
+ "env_logger",
  "gtk",
+ "log",
  "sbbw-exec",
  "sbbw-widget-conf",
  "serde",

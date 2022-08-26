@@ -2,8 +2,13 @@
 - Install command (only if hosted in git repository)
 - New daemon comunication
 - Fork process to background
+- Verbosity level
+- Fix widget log file path
+- Add internal commands (battery, sysinfo, widget)
+- Create nodejs bridgen to the internal API
 
 ### Refactor
+- SbbwWidget new structure, more scalable and easy add features
 - New arguments on cli
 - Replace structopts to native clap
 
@@ -47,7 +52,9 @@ OPTIONS:
     -h, --help            Print help information
         --no-fork
     -p, --port <PORT>     [default: 8111]
+    -q, --quiet           Less output per occurrence
     -s, --show-windows
+    -v, --verbose         More output per occurrence
     -V, --version         Print version information
 
 SUBCOMMANDS:
