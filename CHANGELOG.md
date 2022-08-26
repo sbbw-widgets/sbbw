@@ -69,3 +69,4 @@ SUBCOMMANDS:
 ```
 
 ### TODO
+- Add event callbacks api
