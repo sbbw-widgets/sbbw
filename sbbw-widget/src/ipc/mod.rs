@@ -8,6 +8,7 @@ pub mod widget;
 
 use std::collections::HashMap;
 
+use log::error;
 use sbbw_exec::Params;
 use serde::{Deserialize, Serialize};
 use tao::window::Window;
