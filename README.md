@@ -106,6 +106,7 @@ The `~` home is variable on each operative system
 > **Note:** all this folders and file is extricted required for launch sbbw and show this plugin
 
 > **Other Note very important:** When you create a proyect using, vite, react, vue, any framework, you need set the homepage or basepath like `widget_name/ui`, `/ui` is very important for work correctly
+
 ## Configuration
 The struct of the configuration is this
 ```rust
@@ -174,17 +175,8 @@ This is a list of commands, but this only have two parametters:
 
 > **Note:** the `autostart` folder and `script` folder have a equals behaviour, but in other moment and context, the `autostart` is only executed on start **(if autostart content files or config.toml have changes)** daemon and `script` executed is determined by ui calls
 
-### Developing UI Javascript methods
-- executeCommand(cmd, args)
-- This return a Promise with data as object
-- params: 
-        - cmd: Binary or file to execute on `scripts` folder
-        - args: List of strings, where is specified the arguments for `cmd`
-- return: Return a promise where if
-        - then: return a raw output of command
-        - catch: return an object with
-        - code: Code based on Http responses (this not related with exit code of command, is a totally refered to sbbw response), where 404 can be are a `command not found`
-        - data: this is a raw data of the output of command
+## Widget NodeJs Module
+You can see more details on [wiki page](https://github.com/SergioRibera/sbbw/wiki)
 
 ### TODO
 - [ ] Sbbw daemon detect shortcuts and widgets configurable shortcuts
