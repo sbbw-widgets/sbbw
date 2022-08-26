@@ -8,6 +8,7 @@ use actix_web::{
     Error, HttpResponse, Result,
 };
 use colored::*;
+use log::{info, trace, warn};
 use sbbw_widget_conf::{get_config_path, get_widgets, get_widgets_path, RpcAction, RpcDataRequest};
 use serde::Deserialize;
 use std::{
@@ -34,6 +35,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
         actix_files::Files::new("/", get_widgets_path())
             .index_file("index.html")
             .path_filter(|path, _| {
+                trace!("[{}] Url requested: {:?}", "Daemon".green().bold(), path);
                 let widgets = get_widgets();
                 let widget_name = path
                     .to_str()
@@ -50,27 +52,32 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 }
 
 async fn rpc(body: Json<RpcDataRequest>) -> HttpResponse {
-    println!("Data received: {:?}", &body);
+    info!("[{}] Data received: {:?}", "Daemon".green().bold(), &body);
     match body.action {
-        RpcAction::Open => open_widget(body),
+        RpcAction::Open => open_widget(body, true),
         RpcAction::Close => close_widget(body),
         RpcAction::Toggle => toggle_widget(body).await,
-        RpcAction::Test => open_widget(body),
+        RpcAction::Test => open_widget(body, false),
         _ => HttpResponse::BadRequest().finish(),
     }
 }
 
-fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
+fn open_widget(data: Json<RpcDataRequest>, register: bool) -> HttpResponse {
     let mut widgets = get_state().lock().unwrap();
-    println!("Widgets openned: {:?}", widgets);
+    info!(
+        "[{}] Current widgets openned: {:?}",
+        "Daemon".green().bold(),
+        widgets
+    );
     if widgets.contains_key(&data.widget_name) {
+        warn!("[{}] Widget alredy opened", "Daemon".green().bold());
         return HttpResponse::build(StatusCode::UNAUTHORIZED).body(
             "Widget {} already opened"
                 .red()
                 .replace("{}", &data.widget_name.yellow().bold()),
         );
     }
-    println!("Open: {:?}", data.widget_name);
+    trace!("[{}] Open: {:?}", "Daemon".green().bold(), data.widget_name);
     let file = OpenOptions::new()
         .append(true)
         .create(true)
@@ -84,7 +91,14 @@ fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
         .spawn()
     {
         Ok(subprocess) => {
-            widgets.insert(data.widget_name.clone(), subprocess);
+            if register {
+                trace!(
+                    "[{}] Widget \"{:?}\" added to opens",
+                    "Daemon".green().bold(),
+                    data.widget_name
+                );
+                widgets.insert(data.widget_name.clone(), subprocess);
+            }
             HttpResponse::Ok().finish()
         }
         Err(_) => HttpResponse::InternalServerError().finish(),
@@ -93,26 +107,51 @@ fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
 
 fn close_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let mut widgets = get_state().lock().unwrap();
+    info!(
+        "[{}] Current widgets openned: {:?}",
+        "Daemon".green().bold(),
+        widgets
+    );
 
     if !widgets.contains_key(&data.widget_name) {
+        log::error!("[{}] Widget not before open", "Daemon".green().bold());
         return HttpResponse::build(StatusCode::BAD_GATEWAY).body(
             "Widget {} not running"
                 .red()
                 .replace("{}", &data.widget_name.yellow().bold()),
         );
     }
-    println!("Close: {:?}", data.widget_name);
+    trace!(
+        "[{}] Close: {:?}",
+        "Daemon".green().bold(),
+        data.widget_name
+    );
     if let Some(mut subprocess) = widgets.remove(&data.widget_name) {
         subprocess.kill().unwrap();
         drop(subprocess);
+        trace!(
+            "[{}] Widget process \"{:?}\" droped",
+            "Daemon".green().bold(),
+            data.widget_name
+        );
     }
     HttpResponse::Ok().finish()
 }
 
 async fn toggle_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let widgets = get_state().lock().unwrap();
+    info!(
+        "[{}] Current widgets openned: {:?}",
+        "Daemon".green().bold(),
+        widgets
+    );
+    trace!(
+        "[{}] Toggle widget \"{:?}\"",
+        "Daemon".green().bold(),
+        data.widget_name
+    );
     if !widgets.contains_key(&data.widget_name) {
-        open_widget(data)
+        open_widget(data, true)
     } else {
         close_widget(data)
     }

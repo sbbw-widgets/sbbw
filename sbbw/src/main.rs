@@ -6,6 +6,7 @@ use cmd::{
 };
 use colored::*;
 use fork::{fork, Fork};
+use log::error;
 use sbbw_exec::autostarts;
 use sbbw_widget_conf::{
     exits_widget, generate_config_sbbw, generate_pid_file, get_config_sbbw, get_pid, get_widgets,
@@ -21,6 +22,7 @@ const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 
 fn main() {
+    env_logger::init_from_env(env_logger::Env::default().default_filter_or("trace"));
     let widgets = get_widgets();
     let args = get_args().lock().unwrap();
 
@@ -103,7 +105,7 @@ fn main() {
                             );
                         }
                         Err(e) => {
-                            println!("{e}");
+                            error!("Error on check config {e}");
                             println!(
                                 "{}",
                                 "Config of widget {} is not valid"
@@ -147,7 +149,7 @@ fn main() {
                     }
                 }
                 Err(e) => {
-                    println!("Failed map request: {e}")
+                    error!("Failed map request: {e}")
                 }
             },
         };
