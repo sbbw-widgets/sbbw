@@ -1,12 +1,13 @@
 use std::{ops::Deref, sync::Mutex};
 
 use clap::{AppSettings, Parser, Subcommand};
+use clap_verbosity_flag::{Verbosity, InfoLevel};
 use lazy_static::lazy_static;
 use sbbw_widget_conf::{get_widgets, RpcDataRequest};
 
 use crate::{AUTHORS, DESCRIPTION};
 
-#[derive(Parser, Default, Debug)]
+#[derive(Parser, Debug)]
 #[clap(author = AUTHORS, version, about = DESCRIPTION)]
 #[clap(setting(AppSettings::ArgRequiredElseHelp))]
 #[clap(unset_setting(AppSettings::SubcommandRequiredElseHelp))]
@@ -19,6 +20,8 @@ pub struct ArgOpt {
     pub show_windows: bool,
     #[clap(long)]
     pub no_fork: bool,
+    #[clap(flatten)]
+    pub verbose: Verbosity<InfoLevel>,
 }
 
 #[derive(Subcommand, Debug, Clone)]

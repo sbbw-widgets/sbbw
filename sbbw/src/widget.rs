@@ -54,15 +54,15 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 async fn rpc(body: Json<RpcDataRequest>) -> HttpResponse {
     info!("[{}] Data received: {:?}", "Daemon".green().bold(), &body);
     match body.action {
-        RpcAction::Open => open_widget(body, true),
+        RpcAction::Open => open_widget(body),
         RpcAction::Close => close_widget(body),
         RpcAction::Toggle => toggle_widget(body).await,
-        RpcAction::Test => open_widget(body, false),
+        RpcAction::Test => open_widget(body),
         _ => HttpResponse::BadRequest().finish(),
     }
 }
 
-fn open_widget(data: Json<RpcDataRequest>, register: bool) -> HttpResponse {
+fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let mut widgets = get_state().lock().unwrap();
     info!(
         "[{}] Current widgets openned: {:?}",
@@ -81,7 +81,7 @@ fn open_widget(data: Json<RpcDataRequest>, register: bool) -> HttpResponse {
     let file = OpenOptions::new()
         .append(true)
         .create(true)
-        .open(get_config_path().join(".log"))
+        .open(get_widgets_path().join(&data.widget_name).join(".log"))
         .unwrap();
 
     let out = Stdio::from(file);
@@ -91,14 +91,12 @@ fn open_widget(data: Json<RpcDataRequest>, register: bool) -> HttpResponse {
         .spawn()
     {
         Ok(subprocess) => {
-            if register {
                 trace!(
                     "[{}] Widget \"{:?}\" added to opens",
                     "Daemon".green().bold(),
                     data.widget_name
                 );
                 widgets.insert(data.widget_name.clone(), subprocess);
-            }
             HttpResponse::Ok().finish()
         }
         Err(_) => HttpResponse::InternalServerError().finish(),
@@ -151,7 +149,7 @@ async fn toggle_widget(data: Json<RpcDataRequest>) -> HttpResponse {
         data.widget_name
     );
     if !widgets.contains_key(&data.widget_name) {
-        open_widget(data, true)
+        open_widget(data)
     } else {
         close_widget(data)
     }

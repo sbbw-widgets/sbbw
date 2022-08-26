@@ -22,9 +22,11 @@ const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 
 fn main() {
-    env_logger::init_from_env(env_logger::Env::default().default_filter_or("trace"));
     let widgets = get_widgets();
     let args = get_args().lock().unwrap();
+    env_logger::Builder::new()
+        .filter_level(args.verbose.log_level_filter())
+        .init();
 
     if args.show_windows {
         println!("{}", "Installed widgets:".blue().bold());
