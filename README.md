@@ -31,7 +31,7 @@ This is a Simple and best tool for made Widgets and tools very easy with Web tec
 - more...
 ## Sbbw Usage
 ```sh
-sbbw 0.1.2
+sbbw 0.1.3
 Sergio Ribera
 This is the launcher and manager for the Sbbw Wigets
 
@@ -189,11 +189,13 @@ This is a list of commands, but this only have two parametters:
 ### TODO
 - [ ] Sbbw daemon detect shortcuts and widgets configurable shortcuts
 - [ ] MacOS Stick windows Support
-- [x] Test widget (using web tools)
-- [x] Lua support natively (Rejected)
-- [x] Command to install widget easiest
-- [ ] Javascript variables, like as SO, Widget Name, and more
 - [ ] More Javascript Methods (On Demmand)
-- [ ] Implement common commands natively
-- [ ] Refactor Code (In Progress)
+- [ ] implement media controller built-in
+- [x] ~~Test widget (using web tools)~~
+- [x] ~~Lua support natively (Rejected)~~
+- [x] ~~Command to install widget easiest~~
+- [x] ~~Javascript variables, like as SO, Widget Name, and more~~
+- [x] ~~Nodejs module bridgen api~~
+- [x] ~~Implement common commands natively~~
+- [x] ~~Refactor Code (In Progress)~~
 - [ ] Your Suggestion :D

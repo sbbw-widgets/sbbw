@@ -41,7 +41,7 @@ OPTIONS:
 
 New:
 ```sh
-sbbw 0.1.2
+sbbw 0.1.3
 Sergio Ribera
 This is the launcher and manager for the Sbbw Wigets
 
@@ -70,3 +70,4 @@ SUBCOMMANDS:
 
 ### TODO
 - Add event callbacks api
+- implement media controller built-in
