@@ -1,3 +1,4 @@
+use log::{trace, info, error};
 use sbbw_exec::Params;
 use serde::Serialize;
 use tao::{
@@ -22,6 +23,7 @@ struct SbbwWidgetInfo {
 
 fn info(_win: &Window, name: String, params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
+    trace!("Request Widget data");
 
     let info = SbbwWidgetInfo {
         name,
@@ -36,6 +38,7 @@ fn info(_win: &Window, name: String, params: &Params) -> SbbwResponse {
 
 fn move_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
+    trace!("Request Widget move position: {:?}", params);
 
     if params.args.len() == 2 {
         let x = params.args.get(0).unwrap();
@@ -45,12 +48,14 @@ fn move_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
             x.parse::<f64>().unwrap_or_default(),
             y.parse::<f64>().unwrap_or_default(),
         ));
+        info!("Position data created: {:?}", &new_pos);
 
         win.set_outer_position(new_pos);
 
         res.status = StatusCode::OK.as_u16();
         res.data = "".to_string();
     } else {
+        error!("Bad params");
         res.status = StatusCode::BAD_REQUEST.as_u16();
         res.data = "This require X and Y as param".to_string();
     }
@@ -60,6 +65,7 @@ fn move_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
 
 fn resize_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
+    trace!("Request Widget Resize: {:?}", params);
 
     if params.args.len() == 2 {
         let width = params.args.get(0).unwrap();
@@ -69,6 +75,7 @@ fn resize_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
             width.parse::<f64>().unwrap_or_default(),
             height.parse::<f64>().unwrap_or_default(),
         ));
+        info!("Size data created: {:?}", &new_size);
 
         win.set_resizable(true);
         win.set_inner_size(new_size);
@@ -76,6 +83,7 @@ fn resize_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
         res.status = StatusCode::OK.as_u16();
         res.data = "".to_string();
     } else {
+        error!("Bad params");
         res.status = StatusCode::BAD_REQUEST.as_u16();
         res.data = "This require X and Y as param".to_string();
     }

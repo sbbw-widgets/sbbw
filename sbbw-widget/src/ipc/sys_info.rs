@@ -1,3 +1,4 @@
+use log::trace;
 use sbbw_exec::Params;
 use serde::Serialize;
 use sysinfo::{
@@ -30,6 +31,7 @@ struct SbbwDisk {
 fn disks(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_with_specifics(RefreshKind::new().with_disks());
+    trace!("Request disk list");
 
     let disks = sys
         .disks()
@@ -70,6 +72,7 @@ struct SbbwNetwork {
 fn network(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_with_specifics(RefreshKind::new().with_networks());
+    trace!("Request Network interface list");
 
     let nets = sys
         .networks()
@@ -118,6 +121,7 @@ struct SbbwInfo {
 fn info(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_with_specifics(RefreshKind::new().with_users_list());
+    trace!("Request Info");
 
     let info = SbbwInfo {
         hostname: sys.host_name().unwrap_or_default(),
@@ -157,6 +161,7 @@ struct SbbwMemory {
 fn memory(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_all();
+    trace!("Request Memory(Ram) Data");
 
     let memory = SbbwMemory {
         total: sys.total_memory(),
@@ -186,6 +191,7 @@ struct SbbwCpu {
 fn cpu(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_all();
+    trace!("Request Cpu data");
 
     let cpus = sys
         .cpus()

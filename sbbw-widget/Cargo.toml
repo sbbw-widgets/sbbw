@@ -22,6 +22,8 @@ tauri-plugin-vibrancy = { git = "https://github.com/SergioRibera/tauri-plugin-vi
 clap = { version = "3.2.17", features = ["color", "suggestions", "derive"] }
 sysinfo = "0.25.1"
 battery = "0.7.8"
+env_logger = "0.9.0"
+log = "0.4.17"
 
 [target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
 gtk = "0.15"

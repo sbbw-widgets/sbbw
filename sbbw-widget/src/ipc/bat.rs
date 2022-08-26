@@ -1,6 +1,7 @@
 use std::sync::Mutex;
 
 use battery::Manager;
+use log::{info, trace};
 use sbbw_exec::Params;
 use serde::{Deserialize, Serialize};
 use tao::window::Window;
@@ -8,7 +9,7 @@ use wry::http::status::StatusCode;
 
 use super::{MethodActions, SbbwResponse};
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct SbbwBattery {
     pub vendor: String,
     pub model: String,
@@ -34,6 +35,7 @@ pub fn register(action: &mut MethodActions) {
 
 fn batery_counts(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
+    trace!("Request batteries count");
 
     match Manager::new() {
         Ok(manager) => match manager.batteries() {
@@ -57,6 +59,7 @@ fn batery_counts(_win: &Window, _name: String, _params: &Params) -> SbbwResponse
 
 fn bateries(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
+    trace!("Request all batteries");
 
     match Manager::new() {
         Ok(manager) => match manager.batteries() {
@@ -101,6 +104,7 @@ fn bateries(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
 
 fn main_batery(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
+    trace!("Request main battery");
 
     match Manager::new() {
         Ok(manager) => match manager.batteries() {
@@ -122,6 +126,7 @@ fn main_batery(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
                     time_to_full: b.time_to_full().unwrap_or_default().value,
                     time_to_empty: b.time_to_empty().unwrap_or_default().value,
                 };
+                info!("Battery info: {:?}", &bat);
                 res.status = StatusCode::OK.as_u16();
                 res.data = serde_json::to_string(&bat).unwrap();
             }

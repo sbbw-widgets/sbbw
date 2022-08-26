@@ -14,7 +14,11 @@ function Rpc() {
     this._result = (id, result) => {
         if(this._promises[id]){
             if (result.status == 200)
+            try {
+                this._promises[id].resolve(JSON.parse(result.data))
+            } catch {
                 this._promises[id].resolve(result.data)
+            }
             else
                 this._promises[id].reject({ code: result.status, data: result.data })
             delete this._promises[id];
@@ -40,6 +44,7 @@ function Rpc() {
 window.external = window.external || {};
 window.external.rpc = new Rpc();
 window.rpc = window.external.rpc;
+window.general = window.general || {};
 ##OTHER_VARIABLES##
 })();"#;
 

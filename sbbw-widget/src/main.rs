@@ -11,6 +11,7 @@ mod ipc;
 use clap::Parser;
 use cmd::Args;
 use exts::*;
+use log::{trace, info};
 use serde::{Deserialize, Serialize};
 use tao::window::WindowId;
 use url::Url;
@@ -45,9 +46,10 @@ use wry::{
     Value,
 };
 
-use crate::ipc::{initial::get_initial_js, process_ipc, SbbwResponse, parse_params};
+use crate::ipc::{initial::get_initial_js, parse_params, process_ipc, SbbwResponse};
 
 fn main() {
+    env_logger::init_from_env(env_logger::Env::default().default_filter_or("trace"));
     let args = Args::parse();
 
     let widgets = get_widgets();
@@ -57,6 +59,7 @@ fn main() {
         let widget_conf = sbbw_widget_conf::validate_config_toml(path_to_widget_conf).unwrap();
         let url_ui = args.url.clone();
         let widget_conf_clone = widget_conf.clone();
+        trace!("Widget configuration loaded: {:?}", &widget_conf);
 
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
@@ -113,6 +116,7 @@ fn main() {
             .with_ipc_handler(move |win, msg| {
                 let mut response = SbbwResponse::default();
                 let params: Option<Params> = parse_params(&mut response, msg);
+                info!("Params from frontend parsed: {:?}", &params);
 
                 if response.status != 0 {
                     response = process_ipc(win, widget_name.clone(), &params.as_ref().unwrap());
@@ -121,11 +125,12 @@ fn main() {
                     let webviews = ref_webview.borrow();
                     let webview = webviews.as_ref().unwrap();
                     let response_json = serde_json::to_string(&response).unwrap();
+                    trace!("Response for frontend: {}", &response_json);
                     // println!("response: {}", &response_json);
                     let js = format!(
-                        r#"
-window.external.rpc._result({}, {})"#,
-                        params.unwrap().method_id, response_json
+                        r#"window.external.rpc._result({}, {})"#,
+                        params.unwrap().method_id,
+                        response_json
                     );
                     webview.evaluate_script(js.as_str()).unwrap();
                 });
