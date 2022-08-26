@@ -67,11 +67,12 @@ fn bateries(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
                 let bats = bats
                     .map(|b| {
                         let b = b.unwrap();
+                        let p = (b.energy_full().value / b.energy().value) * 100.;
                         SbbwBattery {
                             vendor: b.vendor().unwrap_or("").to_string(),
                             model: b.model().unwrap_or("").to_string(),
                             serial: b.serial_number().unwrap_or("").to_string(),
-                            percentage: b.energy().value,
+                            percentage: p,
                             energy: b.energy().value,
                             energy_full: b.energy_full().value,
                             voltage: b.voltage().value,
@@ -110,11 +111,12 @@ fn main_batery(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
         Ok(manager) => match manager.batteries() {
             Ok(mut bats) => {
                 let b = bats.next().unwrap().unwrap();
+                let p = (b.energy_full().value / b.energy().value) * 100.;
                 let bat = SbbwBattery {
                     vendor: b.vendor().unwrap_or("").to_string(),
                     model: b.model().unwrap_or("").to_string(),
                     serial: b.serial_number().unwrap_or("").to_string(),
-                    percentage: b.energy().value,
+                    percentage: p,
                     energy: b.energy().value,
                     energy_full: b.energy_full().value,
                     voltage: b.voltage().value,
