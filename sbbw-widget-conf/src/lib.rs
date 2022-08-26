@@ -51,7 +51,7 @@ impl Default for WidgetSize {
     }
 }
 
-#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 #[serde(default)]
 pub struct KeyboardShortcuts {
@@ -60,7 +60,7 @@ pub struct KeyboardShortcuts {
     pub widget: String,
 }
 
-#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 #[serde(default)]
 pub struct SbbwConfig {
@@ -68,7 +68,7 @@ pub struct SbbwConfig {
     pub shortcuts: Vec<KeyboardShortcuts>,
 }
 
-#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 #[serde(default)]
 pub struct AutoStartCommand {
@@ -76,7 +76,7 @@ pub struct AutoStartCommand {
     pub args: Vec<String>,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum RpcAction {
     Open,
@@ -85,7 +85,7 @@ pub enum RpcAction {
     Toggle,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub struct RpcDataRequest {
     pub widget_name: String,
@@ -152,7 +152,7 @@ impl WidgetConfig {
     pub fn new(name: String) -> Self {
         WidgetConfig {
             name: name.clone(),
-            class_name: name.to_uppercase().replace(" ", "_"),
+            class_name: name.to_uppercase().replace(' ', "_"),
             ..Default::default()
         }
     }
@@ -190,7 +190,7 @@ impl WidgetConfig {
 }
 
 fn validate_config_from_string(config: &str) -> Result<WidgetConfig, String> {
-    match toml::from_str::<'_, WidgetConfig>(&config) {
+    match toml::from_str::<'_, WidgetConfig>(config) {
         Ok(conf) => Ok(conf),
         Err(e) => Err(format!(
             "[{}] Config file is not valid: {}",
@@ -217,7 +217,7 @@ pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> 
         ));
     }
     let conf_str = std::fs::read_to_string(conf_path).unwrap();
-    validate_config_from_string(&conf_str.as_str())
+    validate_config_from_string(conf_str.as_str())
 }
 
 pub fn get_pid() -> std::io::Result<String> {
@@ -231,10 +231,7 @@ pub fn generate_pid_file(pid: String) -> bool {
     let mut config = get_config_path();
     config.push("pid");
 
-    match fs::write(config.to_str().unwrap(), pid.as_str()) {
-        Ok(_) => true,
-        Err(_) => false,
-    }
+    fs::write(config.to_str().unwrap(), pid.as_str()).is_ok()
 }
 
 pub fn remove_pid_file() {

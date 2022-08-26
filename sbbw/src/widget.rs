@@ -40,7 +40,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                 let widget_name = path
                     .to_str()
                     .unwrap()
-                    .split("/")
+                    .split('/')
                     .next()
                     .unwrap()
                     .to_string();

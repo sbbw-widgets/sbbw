@@ -81,7 +81,7 @@ pub fn get_args() -> &'static impl Deref<Target = Mutex<ArgOpt>> {
 
 fn validate_widgets(src: &str) -> Result<(), String> {
     let widgets = get_widgets();
-    if let Some(_) = widgets.iter().find(|w| w.as_str().trim() == src) {
+    if widgets.iter().any(|w| w.as_str().trim() == src) {
         Ok(())
     } else {
         Err(format!(
@@ -93,7 +93,7 @@ fn validate_widgets(src: &str) -> Result<(), String> {
 
 fn validate_name_install(src: &str) -> Result<(), String> {
     match validate_widgets(src) {
-        Ok(_) => Err(format!("The widget alredy exists")),
+        Ok(_) => Err("The widget alredy exists".to_string()),
         Err(_) => Ok(()),
     }
 }

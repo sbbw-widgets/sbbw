@@ -119,7 +119,7 @@ fn main() {
                 info!("Params from frontend parsed: {:?}", &params);
 
                 if response.status != 0 {
-                    response = process_ipc(win, widget_name.clone(), &params.as_ref().unwrap());
+                    response = process_ipc(win, widget_name.clone(), params.as_ref().unwrap());
                 }
                 WEBVIEWS.with(|ref_webview| {
                     let webviews = ref_webview.borrow();
@@ -148,12 +148,8 @@ fn main() {
             ref_webview.replace(Some(webview));
         });
 
-        event_loop.run(move |event, _, control_flow| {
+        event_loop.run(move |_event, _, control_flow| {
             *control_flow = ControlFlow::Wait;
-
-            match event {
-                _ => {}
-            }
         });
     } else {
         println!(
@@ -162,6 +158,5 @@ fn main() {
                 .red()
                 .replace("{}", &args.widget_name.yellow().bold())
         );
-        return;
     }
 }

@@ -59,7 +59,7 @@ fn main() {
 
         match cmd {
             WidgetCommands::Run => {
-                if !get_pid().is_err() {
+                if get_pid().is_ok() {
                     println!("{}", "Other Sbbw Daemon is running".red().bold());
                     std::process::exit(1);
                 }

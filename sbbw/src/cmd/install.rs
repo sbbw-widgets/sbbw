@@ -34,7 +34,7 @@ pub fn install_widget(cmd: WidgetCommands) -> Result<(), String> {
         service,
     } = cmd
     {
-        let mut repo_split = repo.split("/");
+        let mut repo_split = repo.split('/');
         if repo_split.clone().count() == 2 {
             let svc_url = match service {
                 Some(svc) => match svc {
@@ -59,7 +59,7 @@ pub fn install_widget(cmd: WidgetCommands) -> Result<(), String> {
                 cb.transfer_progress(|stats| {
                     let mut state = state.borrow_mut();
                     state.progress = Some(stats.to_owned());
-                    print(&mut *state);
+                    print(&mut state);
                     true
                 });
 
@@ -77,7 +77,7 @@ pub fn install_widget(cmd: WidgetCommands) -> Result<(), String> {
                     );
                     state.progress_bar = Some(pb);
                     state.current = cur;
-                    print(&mut *state);
+                    print(&mut state);
                 });
 
                 let mut fo = FetchOptions::new();

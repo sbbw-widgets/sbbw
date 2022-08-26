@@ -1,4 +1,4 @@
-const INITIAL_SCRIPT: &'static str = r#"
+const INITIAL_SCRIPT: &str = r#"
 (function() {
 function Rpc() {
     const self = this;

@@ -18,7 +18,7 @@ pub struct Params {
 }
 
 fn generate_hash_from_file(path: PathBuf) -> Result<String, Box<dyn Error>> {
-    let contents = read_to_string(path.as_path()).unwrap_or("".to_string());
+    let contents = read_to_string(path.as_path()).unwrap_or_else(|_| "".to_string());
     let content_to_hash = format!(
         "{}\n{}",
         path.file_name().unwrap().to_str().unwrap(),
@@ -28,7 +28,7 @@ fn generate_hash_from_file(path: PathBuf) -> Result<String, Box<dyn Error>> {
 
     hash.update(content_to_hash.as_bytes());
 
-    Ok(format!("{:x}", hash.finalize()).to_string())
+    Ok(format!("{:x}", hash.finalize()))
 }
 
 pub fn exec_command(pwd: String, params: Params) -> Result<String, String> {
@@ -44,25 +44,23 @@ pub fn exec_command(pwd: String, params: Params) -> Result<String, String> {
             .args(&["/C", "start"])
             .args(&args)
             .output()
+    } else if file.starts_with("./") {
+        println!("Execute sh command");
+        std::process::Command::new("sh")
+            .arg("-c")
+            .arg(&args.join(" "))
+            .current_dir(pwd)
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .output()
     } else {
-        if file.starts_with("./") {
-            println!("Execute sh command");
-            std::process::Command::new("sh")
-                .arg("-c")
-                .arg(&args.join(" "))
-                .current_dir(pwd)
-                .stdout(std::process::Stdio::piped())
-                .stderr(std::process::Stdio::piped())
-                .output()
-        } else {
-            println!("Execute command");
-            std::process::Command::new(file)
-                .args(&args)
-                .current_dir(pwd)
-                .stdout(std::process::Stdio::piped())
-                .stderr(std::process::Stdio::piped())
-                .output()
-        }
+        println!("Execute command");
+        std::process::Command::new(file)
+            .args(&args)
+            .current_dir(pwd)
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .output()
     };
 
     let stdout = String::from_utf8_lossy(&output.as_ref().unwrap().stdout);
@@ -93,10 +91,10 @@ pub fn autostarts() {
             let content = std::fs::read_to_string(&widget_path.join("config.lock"));
             content
                 .unwrap()
-                .split("\n")
+                .split('\n')
                 .filter(|x| !x.is_empty())
                 .map(|l| {
-                    let mut l = l.split(":");
+                    let mut l = l.split(':');
                     let key = l.next().unwrap();
                     let value = l.next().unwrap();
                     (key.to_string(), value.to_string())
@@ -146,7 +144,7 @@ pub fn autostarts() {
                 let config_toml =
                     validate_config_toml(widget_path.join("config.toml")).unwrap_or_default();
 
-                if config_toml.autostart.len() > 0 {
+                if !config_toml.autostart.is_empty() {
                     for autostart in config_toml.autostart {
                         let mut args = Vec::new();
                         args.push(autostart.cmd.to_string());
