@@ -1,7 +1,7 @@
 use std::{ops::Deref, sync::Mutex};
 
 use clap::{AppSettings, Parser, Subcommand};
-use clap_verbosity_flag::{Verbosity, InfoLevel};
+use clap_verbosity_flag::{InfoLevel, Verbosity};
 use lazy_static::lazy_static;
 use sbbw_widget_conf::{get_widgets, RpcDataRequest};
 

@@ -91,12 +91,12 @@ fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
         .spawn()
     {
         Ok(subprocess) => {
-                trace!(
-                    "[{}] Widget \"{:?}\" added to opens",
-                    "Daemon".green().bold(),
-                    data.widget_name
-                );
-                widgets.insert(data.widget_name.clone(), subprocess);
+            trace!(
+                "[{}] Widget \"{:?}\" added to opens",
+                "Daemon".green().bold(),
+                data.widget_name
+            );
+            widgets.insert(data.widget_name.clone(), subprocess);
             HttpResponse::Ok().finish()
         }
         Err(_) => HttpResponse::InternalServerError().finish(),

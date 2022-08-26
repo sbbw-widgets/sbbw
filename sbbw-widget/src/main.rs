@@ -11,7 +11,7 @@ mod ipc;
 use clap::Parser;
 use cmd::Args;
 use exts::*;
-use log::{trace, info};
+use log::{info, trace};
 use serde::{Deserialize, Serialize};
 use tao::window::WindowId;
 use url::Url;

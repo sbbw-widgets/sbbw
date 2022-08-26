@@ -9,5 +9,5 @@ pub struct Args {
     #[clap(long)]
     pub test: bool,
     #[clap(long)]
-    pub args: Option<String>
+    pub args: Option<String>,
 }

@@ -1,4 +1,4 @@
-use log::{trace, info, error};
+use log::{error, info, trace};
 use sbbw_exec::Params;
 use serde::Serialize;
 use tao::{

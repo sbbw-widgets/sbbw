@@ -233,7 +233,7 @@ pub fn generate_pid_file(pid: String) -> bool {
 
     match fs::write(config.to_str().unwrap(), pid.as_str()) {
         Ok(_) => true,
-        Err(_) => false
+        Err(_) => false,
     }
 }
 
@@ -248,7 +248,10 @@ pub fn generate_config_sbbw(cfg: SbbwConfig) -> Result<(), std::io::Error> {
     let mut path = dirs::config_dir().unwrap();
     path.push("config.toml");
 
-    fs::write(path.to_str().unwrap(), toml::to_string(&cfg).unwrap().as_str())
+    fs::write(
+        path.to_str().unwrap(),
+        toml::to_string(&cfg).unwrap().as_str(),
+    )
 }
 
 pub fn get_config_sbbw() -> Result<SbbwConfig, String> {
@@ -258,7 +261,7 @@ pub fn get_config_sbbw() -> Result<SbbwConfig, String> {
     let raw_str = fs::read_to_string(path.to_str().unwrap()).unwrap_or_default();
     match toml::from_str::<SbbwConfig>(raw_str.as_str()) {
         Ok(data) => Ok(data),
-        Err(e) => Err(e.to_string())
+        Err(e) => Err(e.to_string()),
     }
 }
 

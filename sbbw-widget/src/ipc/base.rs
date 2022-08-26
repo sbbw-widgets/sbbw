@@ -1,4 +1,4 @@
-use log::{trace, info, error};
+use log::{error, info, trace};
 use sbbw_exec::{exec_command, Params};
 use sbbw_widget_conf::get_widgets_path;
 use tao::window::Window;
