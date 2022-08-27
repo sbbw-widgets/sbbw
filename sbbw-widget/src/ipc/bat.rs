@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use tao::window::Window;
 use wry::http::status::StatusCode;
 
-use super::{MethodActions, SbbwResponse};
+use super::SbbwResponse;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct SbbwBattery {
@@ -27,13 +27,7 @@ struct SbbwBattery {
     pub time_to_empty: f32,
 }
 
-pub fn register(action: &mut MethodActions) {
-    action.insert("battery.counts", Box::new(batery_counts));
-    action.insert("battery.all", Box::new(bateries));
-    action.insert("battery.main", Box::new(main_batery));
-}
-
-fn batery_counts(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn batery_counts(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request batteries count");
 
@@ -57,7 +51,7 @@ fn batery_counts(_win: &Window, _name: String, _params: &Params) -> SbbwResponse
     res
 }
 
-fn bateries(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn bateries(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request all batteries");
 
@@ -103,7 +97,7 @@ fn bateries(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     res
 }
 
-fn main_batery(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn main_batery(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request main battery");
 

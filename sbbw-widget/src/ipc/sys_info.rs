@@ -8,15 +8,7 @@ use sysinfo::{
 use tao::window::Window;
 use wry::http::status::StatusCode;
 
-use super::{MethodActions, SbbwResponse};
-
-pub fn register(action: &mut MethodActions) {
-    action.insert("sys.disks", Box::new(disks));
-    action.insert("sys.net", Box::new(network));
-    action.insert("sys.info", Box::new(info));
-    action.insert("sys.memory", Box::new(memory));
-    action.insert("sys.cpu", Box::new(cpu));
-}
+use super::SbbwResponse;
 
 #[derive(Serialize, Clone)]
 struct SbbwDisk {
@@ -28,7 +20,7 @@ struct SbbwDisk {
     pub file_system: String,
 }
 
-fn disks(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn disks(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let mut sys = System::new_all();
     sys.refresh_disks();
@@ -70,7 +62,7 @@ struct SbbwNetwork {
     pub total_errors_on_transmitted: u64,
 }
 
-fn network(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn network(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let mut sys = System::new_all();
     sys.refresh_networks();
@@ -120,7 +112,7 @@ struct SbbwInfo {
     pub users: Vec<SbbwInfoUser>,
 }
 
-fn info(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn info(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_with_specifics(RefreshKind::new().with_users_list());
     trace!("Request Info");
@@ -160,7 +152,7 @@ struct SbbwMemory {
     pub swap_used: u64,
 }
 
-fn memory(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn memory(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_all();
     trace!("Request Memory(Ram) Data");
@@ -190,7 +182,7 @@ struct SbbwCpu {
     pub frequency: u64,
 }
 
-fn cpu(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn cpu(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_all();
     trace!("Request Cpu data");
@@ -212,17 +204,3 @@ fn cpu(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
 
     res
 }
-
-// #[derive(Serialize, Clone)]
-// struct Sbbw {
-// }
-//
-// fn network(_win: &Window, name: String, params: &Params) -> SbbwResponse {
-//     let mut res = SbbwResponse::default();
-//     let sys = System::new_with_specifics(RefreshKind::new().with_disks());
-//
-//     res.status = StatusCode::OK.as_u16();
-//     res.data = serde_json::to_string(&info).unwrap_or_default();
-//
-//     res
-// }

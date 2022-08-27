@@ -20,19 +20,34 @@ pub struct SbbwResponse {
     pub data: String,
 }
 
-pub type MethodActions =
-    HashMap<&'static str, Box<dyn Fn(&Window, String, &Params) -> SbbwResponse>>;
+pub type ActionsFn = fn(&Window, String, &Params) -> SbbwResponse;
 
-fn get_actions() -> MethodActions {
-    let mut actions = MethodActions::new();
-
-    base::register(&mut actions);
-    bat::register(&mut actions);
-    sys_info::register(&mut actions);
-    widget::register(&mut actions);
-
-    actions
-}
+static ACTIONS: &[(&str, ActionsFn)] = &[
+    /*
+     * Base
+     */
+    ("exec", base::exec),
+    /*
+     * Battery
+     */
+    ("battery.counts", bat::batery_counts),
+    ("battery.all", bat::bateries),
+    ("battery.main", bat::main_batery),
+    /*
+     * System Information
+     */
+    ("sys.disks", sys_info::disks),
+    ("sys.net", sys_info::network),
+    ("sys.info", sys_info::info),
+    ("sys.memory", sys_info::memory),
+    ("sys.cpu", sys_info::cpu),
+    /*
+     * Widget
+     */
+    ("widget.info", widget::info),
+    ("widget.move", widget::move_window),
+    ("widget.resize", widget::resize_window),
+];
 
 pub fn parse_params(res: &mut SbbwResponse, msg: String) -> Option<Params> {
     match serde_json::from_str::<Params>(msg.as_str()) {
@@ -51,10 +66,12 @@ pub fn parse_params(res: &mut SbbwResponse, msg: String) -> Option<Params> {
 }
 
 pub fn process_ipc(win: &Window, widget_name: String, params: &Params) -> SbbwResponse {
-    let methods = get_actions();
     let mut res = SbbwResponse::default();
 
-    if let Some(f) = methods.get(params.method.as_str()) {
+    if let Some((_name, f)) = ACTIONS
+        .iter()
+        .find(|(name, _)| &params.method.as_str() == name)
+    {
         res = f(win, widget_name, params);
     } else {
         res.status = StatusCode::NOT_FOUND.as_u16();

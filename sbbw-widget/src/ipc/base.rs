@@ -4,11 +4,7 @@ use sbbw_widget_conf::get_widgets_path;
 use tao::window::Window;
 use wry::http::status::StatusCode;
 
-use super::{MethodActions, SbbwResponse};
-
-pub fn register(action: &mut MethodActions) {
-    action.insert("exec", Box::new(exec));
-}
+use super::SbbwResponse;
 
 pub fn exec(_win: &Window, name: String, params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();

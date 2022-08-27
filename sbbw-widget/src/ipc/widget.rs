@@ -7,13 +7,7 @@ use tao::{
 };
 use wry::http::status::StatusCode;
 
-use super::{MethodActions, SbbwResponse};
-
-pub fn register(action: &mut MethodActions) {
-    action.insert("widget.info", Box::new(info));
-    action.insert("widget.move", Box::new(move_window));
-    action.insert("widget.resize", Box::new(resize_window));
-}
+use super::SbbwResponse;
 
 #[derive(Serialize, Clone)]
 struct SbbwWidgetInfo {
@@ -21,7 +15,7 @@ struct SbbwWidgetInfo {
     pub widget_args: Vec<String>,
 }
 
-fn info(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+pub fn info(_win: &Window, name: String, params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request Widget data");
 
@@ -36,7 +30,7 @@ fn info(_win: &Window, name: String, params: &Params) -> SbbwResponse {
     res
 }
 
-fn move_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
+pub fn move_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request Widget move position: {:?}", params);
 
@@ -63,7 +57,7 @@ fn move_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
     res
 }
 
-fn resize_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
+pub fn resize_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request Widget Resize: {:?}", params);
 
