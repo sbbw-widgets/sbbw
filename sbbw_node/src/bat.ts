@@ -1,3 +1,5 @@
+import { invoke } from "./sbbw"
+
 type SbbwBatteryState = 'unknown' |
     'charging' | 'discharging' |
     'empty' | 'full'
@@ -72,20 +74,20 @@ type SbbwBattery = {
  * @returns A promise with count of batteries
  */
 const getBatteryCounts = (): Promise<number> =>
-    window.rpc.call("battery.counts", [])
+    invoke("battery.counts", null)
 
 
 /**
  * @returns A promise with array of all batteries data
  */
 const getAllBatteries = (): Promise<Array<SbbwBattery>> =>
-    window.rpc.call("battery.all", [])
+    invoke("battery.all", null)
 
 /**
  * @returns A promise with array of all batteries data
  */
 const getMainBattery = (): Promise<SbbwBattery> =>
-    window.rpc.call("battery.main", [])
+    invoke("battery.main", null)
 
 export type { SbbwBattery, SbbwBatteryState, SbbwBatteryTechnology }
 export { getBatteryCounts, getAllBatteries, getMainBattery }

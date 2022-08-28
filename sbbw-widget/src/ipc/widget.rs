@@ -1,27 +1,37 @@
+use clap::Parser;
 use log::{error, info, trace};
 use sbbw_exec::Params;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tao::{
     dpi::{LogicalPosition, LogicalSize, Position, Size},
     window::Window,
 };
 use wry::http::status::StatusCode;
 
+use crate::cmd::Args;
+
 use super::SbbwResponse;
+
+#[derive(Deserialize)]
+struct SbbwWidgetVectorParam {
+    x: f64,
+    y: f64,
+}
 
 #[derive(Serialize, Clone)]
 struct SbbwWidgetInfo {
     pub name: String,
-    pub widget_args: Vec<String>,
+    pub widget_args: String,
 }
 
-pub fn info(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+pub fn info(_win: &Window, name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
+    let args = Args::parse();
     trace!("Request Widget data");
 
     let info = SbbwWidgetInfo {
         name,
-        widget_args: params.args.to_vec(),
+        widget_args: args.args.unwrap_or("".to_string()),
     };
 
     res.status = StatusCode::OK.as_u16();
@@ -30,56 +40,50 @@ pub fn info(_win: &Window, name: String, params: &Params) -> SbbwResponse {
     res
 }
 
-pub fn move_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
+pub fn move_window(win: &Window, _name: String, params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request Widget move position: {:?}", params);
 
-    if params.args.len() == 2 {
-        let x = params.args.get(0).unwrap();
-        let y = params.args.get(1).unwrap();
+    match serde_json::from_str::<SbbwWidgetVectorParam>(params) {
+        Ok(value) => {
+            let new_pos = Position::Logical(LogicalPosition::new(value.x, value.y));
+            info!("Position data created: {:?}", &new_pos);
 
-        let new_pos = Position::Logical(LogicalPosition::new(
-            x.parse::<f64>().unwrap_or_default(),
-            y.parse::<f64>().unwrap_or_default(),
-        ));
-        info!("Position data created: {:?}", &new_pos);
+            win.set_outer_position(new_pos);
 
-        win.set_outer_position(new_pos);
-
-        res.status = StatusCode::OK.as_u16();
-        res.data = "".to_string();
-    } else {
-        error!("Bad params");
-        res.status = StatusCode::BAD_REQUEST.as_u16();
-        res.data = "This require X and Y as param".to_string();
+            res.status = StatusCode::OK.as_u16();
+            res.data = "".to_string();
+        }
+        Err(_) => {
+            error!("Bad params");
+            res.status = StatusCode::BAD_REQUEST.as_u16();
+            res.data = "This require X and Y as param".to_string();
+        }
     }
 
     res
 }
 
-pub fn resize_window(win: &Window, _name: String, params: &Params) -> SbbwResponse {
+pub fn resize_window(win: &Window, _name: String, params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request Widget Resize: {:?}", params);
 
-    if params.args.len() == 2 {
-        let width = params.args.get(0).unwrap();
-        let height = params.args.get(1).unwrap();
+    match serde_json::from_str::<SbbwWidgetVectorParam>(params) {
+        Ok(value) => {
+            let new_size = Size::Logical(LogicalSize::new(value.x, value.y));
+            info!("Size data created: {:?}", &new_size);
 
-        let new_size = Size::Logical(LogicalSize::new(
-            width.parse::<f64>().unwrap_or_default(),
-            height.parse::<f64>().unwrap_or_default(),
-        ));
-        info!("Size data created: {:?}", &new_size);
+            win.set_resizable(true);
+            win.set_inner_size(new_size);
 
-        win.set_resizable(true);
-        win.set_inner_size(new_size);
-
-        res.status = StatusCode::OK.as_u16();
-        res.data = "".to_string();
-    } else {
-        error!("Bad params");
-        res.status = StatusCode::BAD_REQUEST.as_u16();
-        res.data = "This require X and Y as param".to_string();
+            res.status = StatusCode::OK.as_u16();
+            res.data = "".to_string();
+        }
+        Err(_) => {
+            error!("Bad params");
+            res.status = StatusCode::BAD_REQUEST.as_u16();
+            res.data = "This require X and Y as param".to_string();
+        }
     }
 
     res

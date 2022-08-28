@@ -27,7 +27,7 @@ struct SbbwBattery {
     pub time_to_empty: f32,
 }
 
-pub fn batery_counts(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn batery_counts(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request batteries count");
 
@@ -51,7 +51,7 @@ pub fn batery_counts(_win: &Window, _name: String, _params: &Params) -> SbbwResp
     res
 }
 
-pub fn bateries(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn bateries(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request all batteries");
 
@@ -97,7 +97,7 @@ pub fn bateries(_win: &Window, _name: String, _params: &Params) -> SbbwResponse 
     res
 }
 
-pub fn main_batery(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn main_batery(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     trace!("Request main battery");
 

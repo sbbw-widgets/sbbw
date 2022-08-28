@@ -2,7 +2,7 @@
 declare global {
     interface Window {
         rpc: {
-            call: (method: string, args: Array<string>) => Promise<any>
+            call: (method: string, data: any) => Promise<any>
         },
         general: {
             os: string,
@@ -27,8 +27,8 @@ type SbbwResponseError = {
     data: string | GenericData
 }
 
-const invoke = (method: string, args: Array<string>): Promise<any> =>
-    window.rpc.call(method, args)
+const invoke = (method: string, data: any): Promise<any> =>
+    window.rpc.call(method, data)
 
 export type { GenericData, SbbwResponseError }
 export { invoke }

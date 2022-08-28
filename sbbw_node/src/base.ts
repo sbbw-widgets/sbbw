@@ -1,3 +1,5 @@
+import { invoke } from "./sbbw"
+
 type SbbwExecParams = {
     /**
      * Executable file to call
@@ -16,7 +18,7 @@ type SbbwExecParams = {
 }
 
 const exec = (params: SbbwExecParams): Promise<string> =>
-    window.rpc.call("exec", [params.executable, ...params.arguments])
+    invoke("exec", [params.executable, ...params.arguments])
 
 export type { SbbwExecParams }
 export { exec }

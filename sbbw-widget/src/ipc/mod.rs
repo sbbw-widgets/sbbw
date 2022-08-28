@@ -20,7 +20,7 @@ pub struct SbbwResponse {
     pub data: String,
 }
 
-pub type ActionsFn = fn(&Window, String, &Params) -> SbbwResponse;
+pub type ActionsFn = fn(&Window, String, &str) -> SbbwResponse;
 
 static ACTIONS: &[(&str, ActionsFn)] = &[
     /*
@@ -72,7 +72,7 @@ pub fn process_ipc(win: &Window, widget_name: String, params: &Params) -> SbbwRe
         .iter()
         .find(|(name, _)| &params.method.as_str() == name)
     {
-        res = f(win, widget_name, params);
+        res = f(win, widget_name, params.data.as_str());
     } else {
         res.status = StatusCode::NOT_FOUND.as_u16();
         res.data = "Invalid command".to_string();

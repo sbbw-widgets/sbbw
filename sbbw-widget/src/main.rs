@@ -90,7 +90,6 @@ fn main() {
         }
 
         window.set_role(&widget_conf_clone.name, &widget_conf_clone.class_name);
-        // window.set_resizable(false).unwrap();
         if widget_conf_clone.stick {
             window.stick();
         }

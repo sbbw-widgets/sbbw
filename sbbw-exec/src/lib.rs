@@ -14,7 +14,7 @@ use sha1::{Digest, Sha1};
 pub struct Params {
     pub method_id: isize,
     pub method: String,
-    pub args: Vec<String>,
+    pub data: String,
 }
 
 fn generate_hash_from_file(path: PathBuf) -> Result<String, Box<dyn Error>> {
@@ -31,18 +31,18 @@ fn generate_hash_from_file(path: PathBuf) -> Result<String, Box<dyn Error>> {
     Ok(format!("{:x}", hash.finalize()))
 }
 
-pub fn exec_command(pwd: String, params: Params) -> Result<String, String> {
-    let file = params.args.first().expect("The arguments cannot by empty");
+pub fn exec_command(pwd: String, params: Vec<String>) -> Result<String, String> {
+    let file = params.first().expect("The arguments cannot by empty");
     println!("{}", file);
-    let mut args = params.args[1..].to_vec();
+    let mut args = params[1..].to_vec();
     if file.starts_with("./") {
-        args.insert(0, file.clone());
+        args.insert(0, file.to_string());
     }
     println!("{:?}", args);
     let output = if cfg!(target_os = "windows") {
         std::process::Command::new("cmd")
             .args(&["/C", "start"])
-            .args(&args)
+            .args(args)
             .output()
     } else if file.starts_with("./") {
         println!("Execute sh command");
@@ -56,7 +56,7 @@ pub fn exec_command(pwd: String, params: Params) -> Result<String, String> {
     } else {
         println!("Execute command");
         std::process::Command::new(file)
-            .args(&args)
+            .args(args)
             .current_dir(pwd)
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
@@ -150,15 +150,10 @@ pub fn autostarts() {
                         args.push(autostart.cmd.to_string());
                         args.extend(autostart.args);
 
-                        let params = Params {
-                            method_id: 0,
-                            method: "".to_string(),
-                            args,
-                        };
                         if !autostart.cmd.contains(".lua") {
                             match exec_command(
                                 widget_path.join("autostart").to_str().unwrap().to_string(),
-                                params,
+                                args,
                             ) {
                                 Ok(_) => {}
                                 Err(e) => {

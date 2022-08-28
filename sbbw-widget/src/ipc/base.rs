@@ -6,12 +6,14 @@ use wry::http::status::StatusCode;
 
 use super::SbbwResponse;
 
-pub fn exec(_win: &Window, name: String, params: &Params) -> SbbwResponse {
+pub fn exec(_win: &Window, name: String, params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let path_scripts = get_widgets_path().join(&name).join("scripts");
-    trace!("Execute \"exec\" internal");
 
-    match exec_command(String::from(path_scripts.to_str().unwrap()), params.clone()) {
+    trace!("Execute \"exec\" internal");
+    let args = serde_json::from_str::<Vec<String>>(params).unwrap_or(vec![]);
+
+    match exec_command(String::from(path_scripts.to_str().unwrap()), args) {
         Ok(data) => {
             info!("Output of execution: {data}");
             res.status = StatusCode::OK.as_u16();

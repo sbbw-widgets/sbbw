@@ -20,7 +20,7 @@ struct SbbwDisk {
     pub file_system: String,
 }
 
-pub fn disks(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn disks(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let mut sys = System::new_all();
     sys.refresh_disks();
@@ -62,7 +62,7 @@ struct SbbwNetwork {
     pub total_errors_on_transmitted: u64,
 }
 
-pub fn network(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn network(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let mut sys = System::new_all();
     sys.refresh_networks();
@@ -112,7 +112,7 @@ struct SbbwInfo {
     pub users: Vec<SbbwInfoUser>,
 }
 
-pub fn info(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn info(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_with_specifics(RefreshKind::new().with_users_list());
     trace!("Request Info");
@@ -152,7 +152,7 @@ struct SbbwMemory {
     pub swap_used: u64,
 }
 
-pub fn memory(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn memory(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_all();
     trace!("Request Memory(Ram) Data");
@@ -182,7 +182,7 @@ struct SbbwCpu {
     pub frequency: u64,
 }
 
-pub fn cpu(_win: &Window, _name: String, _params: &Params) -> SbbwResponse {
+pub fn cpu(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let sys = System::new_all();
     trace!("Request Cpu data");

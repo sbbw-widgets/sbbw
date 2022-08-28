@@ -1,3 +1,4 @@
+import { invoke } from "./sbbw"
 
 type SbbwWidgetVectorParam = {
     /**
@@ -22,13 +23,13 @@ type SbbwWidgetInfo = {
 }
 
 const getWidgetInfo = (): Promise<SbbwWidgetInfo> =>
-    window.rpc.call("widget.info", [])
+    invoke("widget.info", null)
 
 const movePositionWidget = (param: SbbwWidgetVectorParam): Promise<SbbwWidgetInfo> =>
-    window.rpc.call("widget.move", [param.x.toString(), param.y.toString()])
+    invoke("widget.move", param)
 
 const resizeWidget = (param: SbbwWidgetVectorParam): Promise<SbbwWidgetInfo> =>
-    window.rpc.call("widget.resize", [param.x.toString(), param.y.toString()])
+    invoke("widget.resize", param)
 
 export type { SbbwWidgetInfo, SbbwWidgetVectorParam }
 export { getWidgetInfo, movePositionWidget, resizeWidget}

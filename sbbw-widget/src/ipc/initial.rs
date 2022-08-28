@@ -25,14 +25,14 @@ function Rpc() {
         }
     }
 
-    this.call = function(method, args) {
+    this.call = function(method, data) {
         let array = new Uint32Array(1);
         window.crypto.getRandomValues(array);
         const id = array[0];
         const payload = {
             method_id: id,
             method: method,
-            args,
+            data: JSON.stringify(data),
         };
         const promise = new Promise((resolve, reject) => {
             self._promises[id] = {resolve, reject};

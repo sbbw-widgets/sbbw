@@ -1,3 +1,4 @@
+import { invoke } from "./sbbw"
 
 type SbbwSysInfo = {
     /**
@@ -183,19 +184,19 @@ type SbbwSysInfoCpu = {
 }
 
 const getAllDisks = (): Promise<Array<SbbwSysInfoDisk>> =>
-    window.rpc.call("sys.disks", [])
+    invoke("sys.disks", null)
 
 const getAllNetworks = (): Promise<Array<SbbwSysInfoNetwork>> =>
-    window.rpc.call("sys.net", [])
+    invoke("sys.net", null)
 
 const getSysInfo = (): Promise<Array<SbbwSysInfo>> =>
-    window.rpc.call("sys.info", [])
+    invoke("sys.info", null)
 
 const getMemory = (): Promise<Array<SbbwSysInfoMemory>> =>
-    window.rpc.call("sys.memory", [])
+    invoke("sys.memory", null)
 
 const getCpu = (): Promise<Array<SbbwSysInfoCpu>> =>
-    window.rpc.call("sys.cpu", [])
+    invoke("sys.cpu", null)
 
 export type { SbbwSysInfo, SbbwSysInfoUser, SbbwSysInfoDisk, SbbwSysInfoNetwork, SbbwSysInfoMemory, SbbwSysInfoCpu }
 export { getAllDisks, getAllNetworks, getSysInfo, getMemory, getCpu }
