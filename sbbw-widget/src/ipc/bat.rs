@@ -2,6 +2,7 @@ use std::sync::Mutex;
 
 use battery::Manager;
 use log::{info, trace};
+use once_cell::sync::Lazy;
 use sbbw_exec::Params;
 use serde::{Deserialize, Serialize};
 use tao::window::Window;

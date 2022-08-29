@@ -17,7 +17,7 @@ pub fn is_player_active(_win: &Window, _name: String, _params: &str) -> SbbwResp
     if let Some(player) = get_player(&mut res) {
         let value = player.is_running();
         res.status = StatusCode::OK.as_u16();
-        res.data = serde_json::to_string(&value).unwrap_or("false".to_string());
+        res.data = serde_json::to_string(&value).unwrap_or_else(|_| "false".to_string());
     }
 
     res
@@ -61,19 +61,17 @@ pub fn set_play_pause(_win: &Window, _name: String, params: &str) -> SbbwRespons
                     res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
                     res.data = "Cannot set play".to_string();
                 }
-            } else {
-                if player.can_pause().unwrap_or(false) {
-                    if player.checked_pause().is_ok_and(|v| *v) {
-                        res.status = StatusCode::OK.as_u16();
-                        res.data = "".to_string();
-                    } else {
-                        res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                        res.data = "Error to set pause".to_string();
-                    }
+            } else if player.can_pause().unwrap_or(false) {
+                if player.checked_pause().is_ok_and(|v| *v) {
+                    res.status = StatusCode::OK.as_u16();
+                    res.data = "".to_string();
                 } else {
                     res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                    res.data = "Cannot set pause".to_string();
+                    res.data = "Error to set pause".to_string();
                 }
+            } else {
+                res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
+                res.data = "Cannot set pause".to_string();
             }
         }
     }
@@ -144,7 +142,7 @@ pub fn get_volume(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     if let Some(player) = get_player(&mut res) {
         if let Ok(value) = player.get_volume() {
             res.status = StatusCode::OK.as_u16();
-            res.data = serde_json::to_string(&value).unwrap_or("0.0".to_string());
+            res.data = serde_json::to_string(&value).unwrap_or_else(|_| "0.0".to_string());
         } else {
             res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
             res.data = "Cannot get volume".to_string();
@@ -212,7 +210,7 @@ fn internal_get_state(player: &Player) -> SbbwMediaState {
     SbbwMediaState {
         id: player.unique_name().to_string(),
         player_name: player.identity().to_string(),
-        volume: player.get_volume().map_or(None, |v| Some(v)),
+        volume: player.get_volume().ok(),
         metadata: if player.is_running() {
             Some(SbbwMediaMetadata {
                 track_id: metadata.track_id().to_string(),
@@ -220,15 +218,13 @@ fn internal_get_state(player: &Player) -> SbbwMediaState {
                 album_name: metadata.album_name().unwrap_or("").to_string(),
                 album_artists: metadata.album_artists().unwrap_or(&vec![]).to_vec(),
                 artists: metadata.artists().unwrap_or(&vec![]).to_vec(),
-                art_url: metadata.art_url().map_or(None, |u| Some(u.to_string())),
+                art_url: metadata.art_url().map(|u| u.to_string()),
                 track_length: metadata.length_in_microseconds(),
             })
         } else {
             None
         },
-        track_progress: player
-            .get_position_in_microseconds()
-            .map_or(None, |p| Some(p)),
+        track_progress: player.get_position_in_microseconds().ok(),
         shuffle: player.get_shuffle().unwrap_or(false),
     }
 }

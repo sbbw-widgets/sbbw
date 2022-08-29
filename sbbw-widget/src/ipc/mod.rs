@@ -10,8 +10,8 @@ pub mod widget;
 use std::collections::HashMap;
 
 use log::error;
-use sbbw_exec::Params;
 use media_ctl::prelude as media;
+use sbbw_exec::Params;
 use serde::{Deserialize, Serialize};
 use tao::window::Window;
 use wry::http::status::StatusCode;

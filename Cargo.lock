@@ -2517,6 +2517,7 @@ dependencies = [
  "gtk",
  "log",
  "mpris",
+ "once_cell",
  "sbbw-exec",
  "sbbw-widget-conf",
  "serde",

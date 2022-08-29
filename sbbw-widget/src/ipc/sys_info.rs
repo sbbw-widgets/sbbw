@@ -1,4 +1,7 @@
+use std::sync::Mutex;
+
 use log::trace;
+use once_cell::sync::Lazy;
 use sbbw_exec::Params;
 use serde::Serialize;
 use sysinfo::{
@@ -9,6 +12,8 @@ use tao::window::Window;
 use wry::http::status::StatusCode;
 
 use super::SbbwResponse;
+
+static SYSTEM: Lazy<Mutex<System>> = Lazy::new(|| Mutex::new(System::new_all()));
 
 #[derive(Serialize, Clone)]
 struct SbbwDisk {
@@ -22,7 +27,7 @@ struct SbbwDisk {
 
 pub fn disks(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    let mut sys = System::new_all();
+    let mut sys = SYSTEM.lock().unwrap();
     sys.refresh_disks();
     trace!("Request disk list");
 
@@ -64,7 +69,7 @@ struct SbbwNetwork {
 
 pub fn network(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    let mut sys = System::new_all();
+    let mut sys = SYSTEM.lock().unwrap();
     sys.refresh_networks();
     trace!("Request Network interface list");
 
@@ -114,7 +119,8 @@ struct SbbwInfo {
 
 pub fn info(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    let sys = System::new_with_specifics(RefreshKind::new().with_users_list());
+    let mut sys = SYSTEM.lock().unwrap();
+    sys.refresh_users_list();
     trace!("Request Info");
 
     let info = SbbwInfo {
@@ -154,7 +160,8 @@ struct SbbwMemory {
 
 pub fn memory(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    let sys = System::new_all();
+    let mut sys = SYSTEM.lock().unwrap();
+    sys.refresh_memory();
     trace!("Request Memory(Ram) Data");
 
     let memory = SbbwMemory {
@@ -184,7 +191,8 @@ struct SbbwCpu {
 
 pub fn cpu(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    let sys = System::new_all();
+    let mut sys = SYSTEM.lock().unwrap();
+    sys.refresh_cpu();
     trace!("Request Cpu data");
 
     let cpus = sys

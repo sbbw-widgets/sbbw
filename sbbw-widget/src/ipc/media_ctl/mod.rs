@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use mpris::LoopStatus;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[cfg(target_os = "linux")]
 pub mod linux;
