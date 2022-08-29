@@ -4,7 +4,7 @@ use mpris::LoopStatus;
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_os = "linux")]
-pub mod linux;
+mod linux;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 struct SbbwMediaMetadata {

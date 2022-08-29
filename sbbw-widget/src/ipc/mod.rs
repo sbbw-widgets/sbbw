@@ -2,6 +2,7 @@
 
 pub mod base;
 pub mod bat;
+pub mod brightness_ctl;
 pub mod initial;
 pub mod media_ctl;
 pub mod sys_info;
@@ -9,6 +10,7 @@ pub mod widget;
 
 use std::collections::HashMap;
 
+use brightness_ctl::prelude as bright;
 use log::error;
 use media_ctl::prelude as media;
 use sbbw_exec::Params;
@@ -35,6 +37,13 @@ static ACTIONS: &[(&str, ActionsFn)] = &[
     ("battery.counts", bat::batery_counts),
     ("battery.all", bat::bateries),
     ("battery.main", bat::main_batery),
+    /*
+     * Brightness
+     */
+    ("brightness.main", bright::get_main_brightness),
+    ("brightness.all", bright::get_all_brightness),
+    ("brightness.set_main", bright::set_main_brightness),
+    ("brightness.set_all", bright::set_all_brightness),
     /*
      * Media Control
      */

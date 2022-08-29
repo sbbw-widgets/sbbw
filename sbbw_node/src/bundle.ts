@@ -1,6 +1,7 @@
 import 'regenerator-runtime/runtime'
 import * as sbbw from './sbbw';
 import * as battery from './bat';
+import * as brightness from './brightness';
 import * as base from './base';
 import * as sysinfo from './sysinfo';
 import * as media from './media';
@@ -26,6 +27,7 @@ export {
     sbbw,
     general,
     battery,
+    brightness,
     base,
     media,
     sysinfo,
