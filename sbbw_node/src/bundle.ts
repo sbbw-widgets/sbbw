@@ -3,6 +3,7 @@ import * as sbbw from './sbbw';
 import * as battery from './bat';
 import * as base from './base';
 import * as sysinfo from './sysinfo';
+import * as media from './media';
 import * as widget from './widget';
 
 export type SbbwGeneral = {
@@ -26,6 +27,7 @@ export {
     general,
     battery,
     base,
+    media,
     sysinfo,
     widget
 }
