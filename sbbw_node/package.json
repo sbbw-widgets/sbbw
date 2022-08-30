@@ -1,6 +1,6 @@
 {
     "name": "@sbbw/api",
-    "version": "0.0.4",
+    "version": "0.0.6",
     "description": "Types for create widgets using sbbw",
     "repository": "https://github.com/SergioRibera/sbbw",
     "author": "SergioRibera",

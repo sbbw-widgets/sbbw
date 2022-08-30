@@ -19,7 +19,7 @@ type SbbwWidgetInfo = {
     /**
      * Custom arguments sended by cli when start or close
      */
-    widget_args: Array<string>,
+    widget_args: string,
 }
 
 const getWidgetInfo = (): Promise<SbbwWidgetInfo> =>
