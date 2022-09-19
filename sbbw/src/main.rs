@@ -25,7 +25,8 @@ fn main() {
     let widgets = get_widgets();
     let args = get_args().lock().unwrap();
     env_logger::Builder::new()
-        .filter_level(args.verbose.log_level_filter())
+        // .filter_level(args.verbose.log_level_filter())
+        .filter_level(log::LevelFilter::Trace)
         .init();
 
     if args.show_windows {

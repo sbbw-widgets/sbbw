@@ -5,9 +5,9 @@ use serde::{Deserialize, Serialize};
 use tao::window::Window;
 use wry::http::status::StatusCode;
 
-use crate::ipc::{
-    media_ctl::{SbbwMediaMetadata, SbbwMediaState},
-    SbbwResponse,
+use crate::{
+    builtin::media_ctl::{SbbwMediaMetadata, SbbwMediaState},
+    ipc::SbbwResponse,
 };
 
 pub fn is_player_active(_win: &Window, _name: String, _params: &str) -> SbbwResponse {

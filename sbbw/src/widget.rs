@@ -18,14 +18,14 @@ use std::{
     ops::Deref,
     path::PathBuf,
     process::{Child, Command, Stdio},
-    sync::Mutex,
+    sync::{Arc, Mutex},
 };
 
 lazy_static::lazy_static! {
-    pub static ref WIDGETS: Mutex<HashMap<String, Child>> = Mutex::new(HashMap::new());
+    pub static ref WIDGETS: Arc<Mutex<HashMap<String, Child>>> = Arc::new(Mutex::new(HashMap::new()));
 }
 
-pub fn get_state() -> &'static impl Deref<Target = Mutex<HashMap<String, Child>>> {
+pub fn get_state() -> &'static impl Deref<Target = Arc<Mutex<HashMap<String, Child>>>> {
     &WIDGETS
 }
 
@@ -56,7 +56,7 @@ async fn rpc(body: Json<RpcDataRequest>) -> HttpResponse {
     match body.action {
         RpcAction::Open => open_widget(body),
         RpcAction::Close => close_widget(body),
-        RpcAction::Toggle => toggle_widget(body).await,
+        RpcAction::Toggle => toggle_widget(body),
         RpcAction::Test => open_widget(body),
         _ => HttpResponse::BadRequest().finish(),
     }
@@ -136,7 +136,7 @@ fn close_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     HttpResponse::Ok().finish()
 }
 
-async fn toggle_widget(data: Json<RpcDataRequest>) -> HttpResponse {
+fn toggle_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     let widgets = get_state().lock().unwrap();
     info!(
         "[{}] Current widgets openned: {:?}",
@@ -148,11 +148,21 @@ async fn toggle_widget(data: Json<RpcDataRequest>) -> HttpResponse {
         "Daemon".green().bold(),
         data.widget_name
     );
-    if !widgets.contains_key(&data.widget_name) {
+    let response = if !widgets.contains_key(&data.widget_name) {
+        trace!("[{}] Toggle widget (Open) ", "Daemon".green().bold());
         open_widget(data)
     } else {
+        trace!("[{}] Toggle widget (Close)", "Daemon".green().bold());
         close_widget(data)
-    }
+    };
+
+    trace!(
+        "[{}] Response Toggle widget \"{:?}\"",
+        "Daemon".green().bold(),
+        &response
+    );
+
+    response
 }
 
 #[cfg(test)]

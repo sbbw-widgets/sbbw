@@ -1,18 +1,15 @@
 #![allow(dead_code)]
 
-pub mod base;
-pub mod bat;
-pub mod brightness_ctl;
 pub mod initial;
-pub mod media_ctl;
-pub mod sys_info;
-pub mod widget;
+use crate::builtin::{
+    base, bat, sys_info, widget,
+    brightness_ctl::prelude as bright,
+    media_ctl::prelude as media,
+};
 
 use std::collections::HashMap;
 
-use brightness_ctl::prelude as bright;
 use log::error;
-use media_ctl::prelude as media;
 use sbbw_exec::Params;
 use serde::{Deserialize, Serialize};
 use tao::window::Window;

@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use tao::window::Window;
 use wry::http::status::StatusCode;
 
-use super::SbbwResponse;
+use crate::SbbwResponse;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct SbbwBattery {

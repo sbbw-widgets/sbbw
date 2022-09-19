@@ -11,7 +11,7 @@ use sysinfo::{
 use tao::window::Window;
 use wry::http::status::StatusCode;
 
-use super::SbbwResponse;
+use crate::SbbwResponse;
 
 static SYSTEM: Lazy<Mutex<System>> = Lazy::new(|| Mutex::new(System::new_all()));
 

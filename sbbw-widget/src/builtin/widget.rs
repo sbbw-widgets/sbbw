@@ -10,7 +10,7 @@ use wry::http::status::StatusCode;
 
 use crate::cmd::Args;
 
-use super::SbbwResponse;
+use crate::SbbwResponse;
 
 #[derive(Deserialize)]
 struct SbbwWidgetVectorParam {

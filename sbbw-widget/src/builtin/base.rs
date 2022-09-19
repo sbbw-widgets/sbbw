@@ -4,7 +4,7 @@ use sbbw_widget_conf::get_widgets_path;
 use tao::window::Window;
 use wry::http::status::StatusCode;
 
-use super::SbbwResponse;
+use crate::SbbwResponse;
 
 pub fn exec(_win: &Window, name: String, params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
