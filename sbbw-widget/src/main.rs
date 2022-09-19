@@ -13,6 +13,7 @@ use clap::Parser;
 use cmd::Args;
 use exts::*;
 use log::{info, trace};
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use tao::window::WindowId;
 use url::Url;
@@ -23,20 +24,20 @@ use std::{
     env,
     fs::{self, File},
     path::{Path, PathBuf},
+    rc::Rc,
     sync::{Arc, Mutex},
 };
 
 use colored::*;
 use sbbw_exec::{exec_command, Params};
-use sbbw_widget_conf::{get_widgets, get_widgets_path, WidgetSize};
-use tauri_plugin_vibrancy::Vibrancy;
+use sbbw_widget_conf::{get_widgets, get_widgets_path};
 
 use wry::{
     application::{
-        dpi::{LogicalPosition, LogicalSize, Position, Size},
+        dpi::{LogicalPosition, Position},
         event::{Event, WindowEvent},
         event_loop::{ControlFlow, EventLoop},
-        window::{Fullscreen, Window, WindowBuilder},
+        window::{Window, WindowBuilder},
     },
     http::{
         header::{CONTENT_TYPE, ORIGIN},
@@ -75,33 +76,13 @@ fn main() {
             .build(&event_loop)
             .unwrap();
 
-        if widget_conf.width == WidgetSize::Max && widget_conf.height == WidgetSize::Max {
-            window.set_fullscreen(Some(Fullscreen::Borderless(window.current_monitor())));
-        } else {
-            let monitor_size = &window.current_monitor().unwrap().size();
-            let width = match widget_conf_clone.width {
-                WidgetSize::Max => monitor_size.width as f64,
-                WidgetSize::Value(v) => v,
-            };
-            let height = match widget_conf_clone.height {
-                WidgetSize::Max => monitor_size.height as f64,
-                WidgetSize::Value(v) => v,
-            };
-            window.set_inner_size(Size::Logical(LogicalSize::new(width, height)))
-        }
-
+        window.update_size(&widget_conf);
         window.set_role(&widget_conf_clone.name, &widget_conf_clone.class_name);
         if widget_conf_clone.stick {
             window.stick();
         }
         if widget_conf_clone.blur {
-            #[cfg(target_os = "windows")]
-            window.apply_acrylic();
-            #[cfg(target_os = "macos")]
-            {
-                use tauri_plugin_vibrancy::MacOSVibrancy;
-                window.apply_vibrancy(tauri_plugin_vibrancy::MacOSVibrancy::AppearanceBased);
-            }
+            window.blur_background();
         }
 
         thread_local! {
@@ -121,12 +102,12 @@ fn main() {
                 if response.status != 0 {
                     response = process_ipc(win, widget_name.clone(), params.as_ref().unwrap());
                 }
+
                 WEBVIEWS.with(|ref_webview| {
                     let webviews = ref_webview.borrow();
                     let webview = webviews.as_ref().unwrap();
                     let response_json = serde_json::to_string(&response).unwrap();
                     trace!("Response for frontend: {}", &response_json);
-                    // println!("response: {}", &response_json);
                     let js = format!(
                         r#"window.external.rpc._result({}, {})"#,
                         params.unwrap().method_id,

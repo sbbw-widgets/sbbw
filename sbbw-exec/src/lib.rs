@@ -41,7 +41,7 @@ pub fn exec_command(pwd: String, params: Vec<String>) -> Result<String, String> 
     println!("{:?}", args);
     let output = if cfg!(target_os = "windows") {
         std::process::Command::new("cmd")
-            .args(&["/C", "start"])
+            .args(["/C", "start"])
             .args(args)
             .output()
     } else if file.starts_with("./") {

@@ -13,6 +13,7 @@ where
     let s = String::deserialize(de)?;
     match s.to_ascii_lowercase().as_str() {
         "max" => Ok(WidgetSize::Max),
+        "full" => Ok(WidgetSize::Full),
         _ => {
             let v = s.parse::<f64>();
             if v.is_err() {
@@ -30,6 +31,7 @@ where
 #[derive(Clone, Debug, PartialEq)]
 pub enum WidgetSize {
     Max,
+    Full,
     Value(f64),
 }
 
@@ -40,6 +42,7 @@ impl Serialize for WidgetSize {
     {
         match self {
             WidgetSize::Max => serializer.serialize_str("Max"),
+            WidgetSize::Full => serializer.serialize_str("Full"),
             WidgetSize::Value(v) => serializer.serialize_str(&v.to_string()),
         }
     }

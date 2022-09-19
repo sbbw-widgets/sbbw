@@ -2,9 +2,7 @@
 
 pub mod initial;
 use crate::builtin::{
-    base, bat, sys_info, widget,
-    brightness_ctl::prelude as bright,
-    media_ctl::prelude as media,
+    base, bat, brightness_ctl::prelude as bright, media_ctl::prelude as media, sys_info, widget,
 };
 
 use std::collections::HashMap;
