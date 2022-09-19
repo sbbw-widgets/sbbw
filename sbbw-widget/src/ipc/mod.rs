@@ -3,6 +3,7 @@
 pub mod initial;
 use crate::builtin::{
     base, bat, brightness_ctl::prelude as bright, media_ctl::prelude as media, sys_info, widget,
+    wifi::prelude as wifi,
 };
 
 use std::collections::HashMap;
@@ -35,19 +36,30 @@ static ACTIONS: &[(&str, ActionsFn)] = &[
     /*
      * Brightness
      */
+    #[cfg(not(target_os = "macos"))]
     ("brightness.main", bright::get_main_brightness),
+    #[cfg(not(target_os = "macos"))]
     ("brightness.all", bright::get_all_brightness),
+    #[cfg(not(target_os = "macos"))]
     ("brightness.set_main", bright::set_main_brightness),
+    #[cfg(not(target_os = "macos"))]
     ("brightness.set_all", bright::set_all_brightness),
     /*
      * Media Control
      */
+    #[cfg(target_os = "linux")]
     ("media.play_pause", media::set_play_pause),
+    #[cfg(target_os = "linux")]
     ("media.state", media::get_state),
+    #[cfg(target_os = "linux")]
     ("media.next", media::set_next),
+    #[cfg(target_os = "linux")]
     ("media.prev", media::set_prev),
+    #[cfg(target_os = "linux")]
     ("media.set_volume", media::set_volume),
+    #[cfg(target_os = "linux")]
     ("media.get_volume", media::get_volume),
+    #[cfg(target_os = "linux")]
     ("media.active", media::is_player_active),
     /*
      * System Information
@@ -57,6 +69,11 @@ static ACTIONS: &[(&str, ActionsFn)] = &[
     ("sys.info", sys_info::info),
     ("sys.memory", sys_info::memory),
     ("sys.cpu", sys_info::cpu),
+    /*
+     * Get Wifi Information
+     */
+    #[cfg(target_os = "linux")]
+    ("sys.wifi", wifi::get_wifi_info),
     /*
      * Widget
      */
