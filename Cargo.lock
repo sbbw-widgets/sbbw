@@ -1786,6 +1786,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
+name = "hotkey"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68ed8ca7b33e83cea6c667b7c7185443c39fb155f593dd8eb168ecdd12bed5c8"
+dependencies = [
+ "winapi",
+ "x11-dl",
+]
+
+[[package]]
 name = "http"
 version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2906,6 +2916,7 @@ dependencies = [
  "fork",
  "futures 0.3.24",
  "git2",
+ "hotkey",
  "indicatif",
  "lazy_static",
  "log",
@@ -2960,6 +2971,7 @@ version = "0.1.2"
 dependencies = [
  "colored",
  "dirs",
+ "hotkey",
  "serde",
  "toml",
 ]

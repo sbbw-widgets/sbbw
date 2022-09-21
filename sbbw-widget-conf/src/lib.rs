@@ -1,75 +1,14 @@
-#[allow(unused_imports)]
+mod widget_conf;
+mod sbbw_conf;
+
 use colored::*;
 use serde::{
-    de::{self, Deserializer},
-    Deserialize, Serialize, Serializer,
+    Deserialize, Serialize,
 };
 use std::{fs, path::PathBuf};
 
-fn deserialize_widget_size<'de, D>(de: D) -> Result<WidgetSize, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let s = String::deserialize(de)?;
-    match s.to_ascii_lowercase().as_str() {
-        "max" => Ok(WidgetSize::Max),
-        "full" => Ok(WidgetSize::Full),
-        _ => {
-            let v = s.parse::<f64>();
-            if v.is_err() {
-                return Err(de::Error::custom(format!(
-                    "[{}] Invalid widget size (Cannot convert into f64): {}",
-                    "Error".red().bold(),
-                    s
-                )));
-            }
-            Ok(WidgetSize::Value(v.unwrap()))
-        } // _ => Err(serde::de::Error::custom("error trying to deserialize rotation policy config"))
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum WidgetSize {
-    Max,
-    Full,
-    Value(f64),
-}
-
-impl Serialize for WidgetSize {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match self {
-            WidgetSize::Max => serializer.serialize_str("Max"),
-            WidgetSize::Full => serializer.serialize_str("Full"),
-            WidgetSize::Value(v) => serializer.serialize_str(&v.to_string()),
-        }
-    }
-}
-
-impl Default for WidgetSize {
-    fn default() -> Self {
-        WidgetSize::Max
-    }
-}
-
-#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-#[serde(default)]
-pub struct KeyboardShortcuts {
-    pub special: String,
-    pub key: String,
-    pub widget: String,
-}
-
-#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-#[serde(default)]
-pub struct SbbwConfig {
-    pub port: u16,
-    pub shortcuts: Vec<KeyboardShortcuts>,
-}
+pub use widget_conf::*;
+pub use sbbw_conf::prelude::*;
 
 #[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
@@ -77,119 +16,6 @@ pub struct SbbwConfig {
 pub struct AutoStartCommand {
     pub cmd: String,
     pub args: Vec<String>,
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-pub enum RpcAction {
-    Open,
-    Close,
-    Test,
-    Toggle,
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-pub struct RpcDataRequest {
-    pub widget_name: String,
-    pub action: RpcAction,
-    pub url: String,
-    pub widget_params: Option<String>,
-}
-
-impl RpcDataRequest {
-    pub fn get_args(self) -> Vec<String> {
-        let mut args = Vec::new();
-        if self.action == RpcAction::Test {
-            args.push("--test".to_string());
-        }
-        if let Some(a) = self.widget_params {
-            args.push("--args".to_string());
-            args.push(a);
-        }
-        args.push("--widget-name".to_string());
-        args.push(self.widget_name);
-        args.push(self.url);
-        args
-    }
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
-#[serde(rename_all = "lowercase")]
-#[serde(default)]
-pub struct WidgetConfig {
-    pub name: String,
-    pub class_name: String, // TODO: add support
-    #[serde(deserialize_with = "deserialize_widget_size")]
-    pub width: WidgetSize,
-    #[serde(deserialize_with = "deserialize_widget_size")]
-    pub height: WidgetSize,
-    pub x: f32,
-    pub y: f32,
-    pub transparent: bool, // Only works on Windows and Mac. For the linux users can be set with compositor
-    pub blur: bool,
-    pub always_on_top: bool,
-    pub stick: bool,
-    pub autostart: Vec<AutoStartCommand>,
-}
-
-impl Default for WidgetConfig {
-    fn default() -> Self {
-        WidgetConfig {
-            name: "Internal".to_string(),
-            class_name: "Internal_Class".to_string(),
-            width: WidgetSize::Value(200.0),
-            height: WidgetSize::Max,
-            x: 0.0,
-            y: 0.0,
-            transparent: true,
-            blur: true,
-            always_on_top: true,
-            stick: true,
-            autostart: vec![],
-        }
-    }
-}
-
-impl WidgetConfig {
-    pub fn new(name: String) -> Self {
-        WidgetConfig {
-            name: name.clone(),
-            class_name: name.to_uppercase().replace(' ', "_"),
-            ..Default::default()
-        }
-    }
-
-    pub fn set_name(&mut self, name: String) -> &mut Self {
-        self.name = name;
-        self
-    }
-    pub fn set_class_name(&mut self, class_name: String) -> &mut Self {
-        self.class_name = class_name;
-        self
-    }
-
-    pub fn set_size(&mut self, width: WidgetSize, height: WidgetSize) {
-        self.width = width;
-        self.height = height;
-    }
-
-    pub fn set_position(&mut self, x: f32, y: f32) {
-        self.x = x;
-        self.y = y;
-    }
-
-    pub fn set_transparent(&mut self, transparent: bool) {
-        self.transparent = transparent;
-    }
-
-    pub fn set_blur(&mut self, blur: bool) {
-        self.blur = blur;
-    }
-
-    pub fn set_always_on_top(&mut self, allways_on_top: bool) {
-        self.always_on_top = allways_on_top;
-    }
 }
 
 fn validate_config_from_string(config: &str) -> Result<WidgetConfig, String> {
