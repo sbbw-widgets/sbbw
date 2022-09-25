@@ -1,0 +1,20 @@
+{
+    "configurations": {
+        "Launch": {
+            "adapter": "CodeLLDB",
+            "filetypes": [
+                "rust"
+            ],
+            "configuration": {
+                "externalConsole": true,
+                "request": "launch",
+                "program": "${workspaceRoot}/target/debug/sbbw",
+                "args": [
+                    "--no-fork",
+                    "--quiet",
+                    "run"
+                ]
+            }
+        }
+    }
+}
