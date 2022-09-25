@@ -36,7 +36,7 @@ fn main() {
         }
     }
 
-    match Command::new("sbbw-widget").spawn() {
+    match Command::new("sbbw-widget").args(["-h"]).spawn() {
         Ok(mut c) => {
             c.kill().unwrap();
             drop(c);

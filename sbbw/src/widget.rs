@@ -53,17 +53,16 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
 
 async fn rpc(body: Json<RpcDataRequest>) -> HttpResponse {
     info!("[{}] Data received: {:?}", "Daemon".green().bold(), &body);
+    let mut widgets = get_state().lock().unwrap();
     match body.action {
-        RpcAction::Open => open_widget(body),
-        RpcAction::Close => close_widget(body),
-        RpcAction::Toggle => toggle_widget(body),
-        RpcAction::Test => open_widget(body),
+        RpcAction::Open | RpcAction::Test => open_widget(&mut widgets, body),
+        RpcAction::Close => close_widget(&mut widgets, body),
+        RpcAction::Toggle => toggle_widget(&mut widgets, body),
         _ => HttpResponse::BadRequest().finish(),
     }
 }
 
-fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
-    let mut widgets = get_state().lock().unwrap();
+fn open_widget(widgets: &mut HashMap<String, Child>, data: Json<RpcDataRequest>) -> HttpResponse {
     info!(
         "[{}] Current widgets openned: {:?}",
         "Daemon".green().bold(),
@@ -103,8 +102,7 @@ fn open_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     }
 }
 
-fn close_widget(data: Json<RpcDataRequest>) -> HttpResponse {
-    let mut widgets = get_state().lock().unwrap();
+fn close_widget(widgets: &mut HashMap<String, Child>, data: Json<RpcDataRequest>) -> HttpResponse {
     info!(
         "[{}] Current widgets openned: {:?}",
         "Daemon".green().bold(),
@@ -136,8 +134,7 @@ fn close_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     HttpResponse::Ok().finish()
 }
 
-fn toggle_widget(data: Json<RpcDataRequest>) -> HttpResponse {
-    let widgets = get_state().lock().unwrap();
+fn toggle_widget(widgets: &mut HashMap<String, Child>, data: Json<RpcDataRequest>) -> HttpResponse {
     info!(
         "[{}] Current widgets openned: {:?}",
         "Daemon".green().bold(),
@@ -150,10 +147,10 @@ fn toggle_widget(data: Json<RpcDataRequest>) -> HttpResponse {
     );
     let response = if !widgets.contains_key(&data.widget_name) {
         trace!("[{}] Toggle widget (Open) ", "Daemon".green().bold());
-        open_widget(data)
+        open_widget(widgets, data)
     } else {
         trace!("[{}] Toggle widget (Close)", "Daemon".green().bold());
-        close_widget(data)
+        close_widget(widgets, data)
     };
 
     trace!(
