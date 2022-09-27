@@ -1,14 +1,12 @@
-mod widget_conf;
 mod sbbw_conf;
+mod widget_conf;
 
 use colored::*;
-use serde::{
-    Deserialize, Serialize,
-};
+use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf};
 
-pub use widget_conf::*;
 pub use sbbw_conf::prelude::*;
+pub use widget_conf::*;
 
 #[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
@@ -29,7 +27,7 @@ fn validate_config_from_string(config: &str) -> Result<WidgetConfig, String> {
     }
 }
 pub fn exits_widget(widget_name: String) -> bool {
-    let widgets = get_widgets();
+    let (widgets, _): (Vec<String>, Vec<WidgetConfig>) = get_widgets().iter().cloned().unzip();
     let exists = widgets.contains(&widget_name);
     if exists {
         let path_conf = get_widgets_path().join(widget_name).join("config.toml");
@@ -71,7 +69,7 @@ pub fn remove_pid_file() {
 }
 
 pub fn generate_config_sbbw(cfg: SbbwConfig) -> Result<(), std::io::Error> {
-    let mut path = dirs::config_dir().unwrap();
+    let mut path = get_config_path();
     path.push("config.toml");
 
     fs::write(
@@ -81,7 +79,7 @@ pub fn generate_config_sbbw(cfg: SbbwConfig) -> Result<(), std::io::Error> {
 }
 
 pub fn get_config_sbbw() -> Result<SbbwConfig, String> {
-    let mut path = dirs::config_dir().unwrap();
+    let mut path = get_config_path();
     path.push("config.toml");
 
     let raw_str = fs::read_to_string(path.to_str().unwrap()).unwrap_or_default();
@@ -103,7 +101,7 @@ pub fn get_widgets_path() -> PathBuf {
     fs::create_dir_all(&path).unwrap();
     path
 }
-pub fn get_widgets() -> Vec<String> {
+pub fn get_widgets() -> Vec<(String, WidgetConfig)> {
     let paths = fs::read_dir(get_widgets_path()).unwrap();
     paths
         .filter_map(|path| {
@@ -113,7 +111,9 @@ pub fn get_widgets() -> Vec<String> {
                 let mut config_path = path.clone();
                 config_path.push("config.toml");
                 if config_path.exists() {
-                    Some(path.file_name().unwrap().to_str().unwrap().to_string())
+                    let widget_name = path.file_name().unwrap().to_str().unwrap().to_string();
+                    let widget_cfg = validate_config_toml(config_path).unwrap();
+                    Some((widget_name, widget_cfg))
                 } else {
                     None
                 }
@@ -129,6 +129,7 @@ mod tests {
     use std::path::PathBuf;
 
     use crate::WidgetSize;
+    use super::*;
 
     #[test]
     fn test_validate_config_toml() {
