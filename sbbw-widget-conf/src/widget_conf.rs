@@ -1,5 +1,8 @@
 use colored::Colorize;
-use serde::{de::{self, Deserializer}, Serializer, Serialize, Deserialize};
+use serde::{
+    de::{self, Deserializer},
+    Deserialize, Serialize, Serializer,
+};
 
 use crate::AutoStartCommand;
 

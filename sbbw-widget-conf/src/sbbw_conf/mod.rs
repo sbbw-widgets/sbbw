@@ -1,6 +1,6 @@
 mod rpc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
@@ -20,6 +20,5 @@ pub struct SbbwConfig {
 }
 
 pub mod prelude {
-    pub use super::*;
-    pub use super::rpc::*;
+    pub use super::{rpc::*, *};
 }

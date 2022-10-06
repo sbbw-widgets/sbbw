@@ -128,8 +128,8 @@ pub fn get_widgets() -> Vec<(String, WidgetConfig)> {
 mod tests {
     use std::path::PathBuf;
 
-    use crate::WidgetSize;
     use super::*;
+    use crate::WidgetSize;
 
     #[test]
     fn test_validate_config_toml() {
