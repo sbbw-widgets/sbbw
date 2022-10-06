@@ -44,7 +44,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                     .next()
                     .unwrap()
                     .to_string();
-                widgets.contains(&widget_name)
+                widgets.iter().any(|(w, _)| w == &widget_name)
             }),
     )
     // api service

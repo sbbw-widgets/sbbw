@@ -3,7 +3,7 @@ use std::{ops::Deref, sync::Mutex};
 use clap::{AppSettings, Parser, Subcommand};
 use clap_verbosity_flag::{InfoLevel, Verbosity};
 use lazy_static::lazy_static;
-use sbbw_widget_conf::{get_widgets, RpcDataRequest};
+use sbbw_widget_conf::{get_widgets, RpcDataRequest, WidgetConfig};
 
 use crate::{AUTHORS, DESCRIPTION};
 
@@ -81,7 +81,8 @@ pub fn get_args() -> &'static impl Deref<Target = Mutex<ArgOpt>> {
 
 fn validate_widgets(src: &str) -> Result<(), String> {
     let widgets = get_widgets();
-    if widgets.iter().any(|w| w.as_str().trim() == src) {
+    let (widgets, _): (Vec<String>, Vec<WidgetConfig>) = widgets.into_iter().unzip();
+    if widgets.contains(&src.trim().to_string()) {
         Ok(())
     } else {
         Err(format!(

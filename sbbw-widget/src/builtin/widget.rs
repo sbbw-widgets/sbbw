@@ -31,7 +31,7 @@ pub fn info(_win: &Window, name: String, _params: &str) -> SbbwResponse {
 
     let info = SbbwWidgetInfo {
         name,
-        widget_args: args.args.unwrap_or_else(|| "".to_string()),
+        widget_args: args.args.unwrap_or_default(),
     };
 
     res.status = StatusCode::OK.as_u16();

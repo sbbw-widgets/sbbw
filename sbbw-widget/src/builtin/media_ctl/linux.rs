@@ -50,7 +50,7 @@ pub fn set_play_pause(_win: &Window, _name: String, params: &str) -> SbbwRespons
         if let Some(player) = get_player(&mut res) {
             if play {
                 if player.can_play().unwrap_or(false) {
-                    if player.checked_play().is_ok_and(|v| *v) {
+                    if player.checked_play().is_ok_and(|v| v) {
                         res.status = StatusCode::OK.as_u16();
                         res.data = "".to_string();
                     } else {
@@ -62,7 +62,7 @@ pub fn set_play_pause(_win: &Window, _name: String, params: &str) -> SbbwRespons
                     res.data = "Cannot set play".to_string();
                 }
             } else if player.can_pause().unwrap_or(false) {
-                if player.checked_pause().is_ok_and(|v| *v) {
+                if player.checked_pause().is_ok_and(|v| v) {
                     res.status = StatusCode::OK.as_u16();
                     res.data = "".to_string();
                 } else {
@@ -85,7 +85,7 @@ pub fn set_next(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
 
     if let Some(player) = get_player(&mut res) {
         if player.can_go_next().unwrap_or(false) {
-            if player.checked_next().is_ok_and(|v| *v) {
+            if player.checked_next().is_ok_and(|v| v) {
                 let state = internal_get_state(&player);
                 if let Ok(json) = serde_json::to_string(&state) {
                     res.status = StatusCode::OK.as_u16();
@@ -113,7 +113,7 @@ pub fn set_prev(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
 
     if let Some(player) = get_player(&mut res) {
         if player.can_go_previous().unwrap_or(false) {
-            if player.checked_previous().is_ok_and(|v| *v) {
+            if player.checked_previous().is_ok_and(|v| v) {
                 let state = internal_get_state(&player);
                 if let Ok(json) = serde_json::to_string(&state) {
                     res.status = StatusCode::OK.as_u16();

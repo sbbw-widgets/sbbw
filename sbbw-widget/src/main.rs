@@ -1,4 +1,4 @@
-#![feature(proc_macro_hygiene, decl_macro, is_some_with)]
+#![feature(proc_macro_hygiene, decl_macro, is_some_and)]
 #![allow(unused_imports)]
 #![cfg_attr(
     all(not(debug_assertions), target_os = "windows"),
@@ -55,7 +55,7 @@ fn main() {
     let args = Args::parse();
 
     let widgets = get_widgets();
-    if widgets.contains(&args.widget_name) {
+    if widgets.iter().any(|(w, _)| w == &args.widget_name) {
         let widget_name = args.widget_name.clone();
         let path_to_widget_conf = get_widgets_path().join(&widget_name).join("config.toml");
         let widget_conf = sbbw_widget_conf::validate_config_toml(path_to_widget_conf).unwrap();

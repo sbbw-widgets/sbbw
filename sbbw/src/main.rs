@@ -31,7 +31,7 @@ fn main() {
 
     if args.show_windows {
         println!("{}", "Installed widgets:".blue().bold());
-        for widget in &widgets {
+        for (widget, _) in &widgets {
             println!("{} {}", "-".blue(), widget);
         }
     }
