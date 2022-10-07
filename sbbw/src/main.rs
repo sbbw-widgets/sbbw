@@ -6,20 +6,31 @@ use cmd::{
 };
 use colored::*;
 use fork::{fork, Fork};
+use lazy_static::lazy_static;
 use log::error;
 use sbbw_exec::autostarts;
 use sbbw_widget_conf::{
     exits_widget, generate_config_sbbw, generate_pid_file, get_config_sbbw, get_pid, get_widgets,
     get_widgets_path, remove_pid_file, validate_config_toml, SbbwConfig,
 };
-use std::{env, process::Command};
-use widget::routes;
+use std::{
+    env,
+    process::Command,
+    sync::{Arc, Mutex},
+};
+use widget::rpc::routes;
+
+use crate::widget::prelude::listen_keybinds;
 
 mod cmd;
 mod widget;
 
 const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
+
+lazy_static! {
+    pub static ref SBBW_CONFIG: Arc<Mutex<Option<SbbwConfig>>> = Arc::new(Mutex::new(None));
+}
 
 fn main() {
     let widgets = get_widgets();
@@ -53,9 +64,19 @@ fn main() {
     autostarts();
 
     if let Some(cmd) = &args.widget_cmd {
-        let port = match get_config_sbbw() {
-            Ok(cfg) => cfg.port,
-            Err(_) => args.port,
+        let mut port = args.port;
+        let mut conf = SBBW_CONFIG.lock().unwrap();
+        *conf = match get_config_sbbw() {
+            Ok(cfg) => {
+                port = cfg.port;
+                Some(cfg)
+            }
+            Err(_) => {
+                println!("Generating default config file");
+                let cfg = SbbwConfig::default();
+                generate_config_sbbw(cfg.clone()).expect("Failed generating config File");
+                Some(cfg)
+            }
         };
 
         match cmd {
@@ -76,11 +97,18 @@ fn main() {
                 } else {
                     generate_pid_file(std::process::id().to_string());
                 }
-                generate_config_sbbw(SbbwConfig {
-                    port: args.port,
-                    ..Default::default()
-                })
-                .unwrap();
+
+                let conf = conf.clone();
+                if let Some(cfg) = conf {
+                    if args.port != port {
+                        generate_config_sbbw(SbbwConfig {
+                            port: args.port,
+                            ..cfg.clone()
+                        })
+                        .unwrap();
+                    }
+                    listen_keybinds(cfg);
+                }
 
                 let server = HttpServer::new(move || App::new().configure(routes))
                     .bind(("0.0.0.0", port))

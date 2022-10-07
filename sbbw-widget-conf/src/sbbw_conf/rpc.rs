@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum RpcAction {
     Open,
     Close,
     Test,
+    #[default]
     Toggle,
 }
 

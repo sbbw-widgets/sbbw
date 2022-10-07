@@ -21,8 +21,7 @@ timeout /t 2 > NUL
 
 if exist "%PATH_TO_INSTALL%\sbbw.exe" (
     echo sbbw already installed
-    pause >nul
-    exit 1
+    echo Updating sbbw
 )
 if not exist "%CURRENT_DIR%\sbbw.exe" (
     echo sbbw binary not found
