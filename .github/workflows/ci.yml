@@ -35,11 +35,11 @@ jobs:
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
         with:
-          profile: nightly
-          toolchain: stable
+          profile: minimal
+          toolchain: nightly
           override: true
       - name: Install Dependencies
-        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev webkit2gtk-4.0 libgtksourceview-3.0-dev libappindicator3-dev libgtk-3-0
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev webkit2gtk-4.0 libgtksourceview-3.0-dev libappindicator3-dev libgtk-3-0 llvm-dev libclang-dev clang libiw-dev
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
@@ -70,7 +70,7 @@ jobs:
           components: clippy
           override: true
       - name: Install Dependencies
-        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev webkit2gtk-4.0 libgtksourceview-3.0-dev libappindicator3-dev libgtk-3-0
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev webkit2gtk-4.0 libgtksourceview-3.0-dev libappindicator3-dev libgtk-3-0 llvm-dev libclang-dev clang libiw-dev
       - name: Run clippy
         uses: actions-rs/clippy-check@v1
         with:

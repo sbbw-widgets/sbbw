@@ -132,9 +132,10 @@ mod tests {
     use crate::WidgetSize;
 
     #[test]
+    #[ignore = "Require Pre-configuration"]
     fn test_validate_config_toml() {
         let conf_path = PathBuf::from("/tmp/test_config.toml");
-        let conf = super::validate_config_toml(conf_path).unwrap();
+        let conf = validate_config_toml(conf_path).unwrap();
         assert_eq!(conf.name, "Test");
         assert_eq!(conf.class_name, "Test_Class");
         assert_eq!(conf.width, WidgetSize::Value(200.0));
@@ -159,7 +160,7 @@ mod tests {
             blur = true
             always_on_top=true
         "#;
-        let conf = super::validate_config_from_string(raw_conf).unwrap();
+        let conf = validate_config_from_string(raw_conf).unwrap();
 
         assert_eq!(conf.name, "Test");
         assert_eq!(conf.class_name, "Test_Class");
@@ -181,7 +182,7 @@ mod tests {
             x = 0.0
             always_on_top=true
         "#;
-        let conf = super::validate_config_from_string(raw_conf).unwrap();
+        let conf = validate_config_from_string(raw_conf).unwrap();
 
         assert_eq!(conf.name, "Test");
         assert_eq!(conf.class_name, "Test Class");
