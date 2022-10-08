@@ -83,7 +83,7 @@ jobs:
             ${{ matrix.platform }}-stable-cargo-core-
       - uses: actions-rs/clippy-check@v1
         with:
-          toke: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features -D Warnings
       - name: Check Format
         run: cargo fmt --all -- --check
