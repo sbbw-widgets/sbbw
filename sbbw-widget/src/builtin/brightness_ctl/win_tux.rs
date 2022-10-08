@@ -109,7 +109,7 @@ pub fn set_all_brightness(_win: &Window, _name: String, params: &str) -> SbbwRes
 
 fn get_all_devices() -> Result<Vec<SbbwBrightnessDevice>, String> {
     let m = brightness::blocking::brightness_devices()
-        .map(|dev| {
+        .filter_map(|dev| {
             if let Ok(dev) = dev {
                 Some(SbbwBrightnessDevice {
                     name: dev.device_name().unwrap_or_else(|_| "".to_string()),
@@ -118,7 +118,6 @@ fn get_all_devices() -> Result<Vec<SbbwBrightnessDevice>, String> {
             } else {
                 None
             }
-        })
-        .flatten();
+        });
     Ok(m.collect::<Vec<SbbwBrightnessDevice>>())
 }
