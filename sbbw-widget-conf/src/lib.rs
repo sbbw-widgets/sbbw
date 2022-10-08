@@ -132,6 +132,7 @@ mod tests {
     use crate::WidgetSize;
 
     #[test]
+    #[ignore = "Require Pre-configuration"]
     fn test_validate_config_toml() {
         let conf_path = PathBuf::from("/tmp/test_config.toml");
         let conf = validate_config_toml(conf_path).unwrap();
