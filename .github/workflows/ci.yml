@@ -1,88 +1,98 @@
 name: CI
-
 on:
   push:
-    branches:
-      - main
-      - dev
   pull_request:
     branches:
       - main
       - dev
-    types:
-      - 'edited'
-      - 'opened'
-      - 'synchronize'
-      - 'reopened'
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "setup/**"
+      - "sbbw_node/**"
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        rust_version: [nightly]
-        platform:
-          - { target: x86_64-pc-windows-msvc, os: windows-latest }
-          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
-          - { target: x86_64-apple-darwin, os: macos-latest }
-
-    runs-on: ${{ matrix.platform.os }}
-
+  # Run cargo test
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: install rust nightly
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-          target: ${{ matrix.platform.target }}
-
-      - name: install webkit2gtk (ubuntu only)
-        if: matrix.platform.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.0 libgtksourceview-3.0-dev libappindicator3-dev libgtk-3-0
-      - name: install webview2 (windows only)
-        if: matrix.platform.os == 'windows-latest'
-        shell: pwsh
-        run: |
-          Invoke-WebRequest https://go.microsoft.com/fwlink/p/?LinkId=2124703 -OutFile installwebview.exe -UseBasicParsing
-          cmd /C start /wait installwebview.exe /silent /install
-      - name: Cache cargo registry
-        uses: actions/cache@v2.1.4
-        with:
-          path: ~/.cargo/registry
-          # Add date to the cache to keep it up to date
-          key: ${{ matrix.platform }}-stable-cargo-registry-${{ hashFiles('Cargo.toml') }}-${{ env.CURRENT_DATE }}
-          # Restore from outdated cache for speed
-          restore-keys: |
-            ${{ matrix.platform }}-stable-cargo-registry-${{ hashFiles('Cargo.toml') }}
-            ${{ matrix.platform }}-stable-cargo-registry-
-      - name: Cache cargo index
-        uses: actions/cache@v2.1.4
-        with:
-          path: ~/.cargo/git
-          # Add date to the cache to keep it up to date
-          key: ${{ matrix.platform }}-stable-cargo-index-${{ hashFiles('Cargo.toml') }}-${{ env.CURRENT_DATE }}
-          # Restore from outdated cache for speed
-          restore-keys: |
-            ${{ matrix.platform }}-stable-cargo-index-${{ hashFiles('Cargo.toml') }}
-            ${{ matrix.platform }}-stable-cargo-index-
-      - name: Cache cargo target
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Cache
         uses: actions/cache@v2
         with:
-          path: target
-          # Add date to the cache to keep it up to date
-          key: ${{ matrix.platform }}-stable-cargo-core-${{ hashFiles('Cargo.toml') }}-${{ env.CURRENT_DATE }}
-          # Restore from outdated cache for speed
-          restore-keys: |
-            ${{ matrix.platform }}-stable-cargo-core-${{ hashFiles('Cargo.toml') }}
-            ${{ matrix.platform }}-stable-cargo-core-
-      - uses: actions-rs/clippy-check@v1
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Install Dependencies
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+  # Run cargo clippy -- -D warnings
+  clippy_check:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.toml') }}
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: clippy
+          override: true
+      - name: Install Dependencies
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev
+      - name: Run clippy
+        uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features -- -D Warnings
-      - name: Check Format
-        run: cargo fmt --all -- --check
-      - name: Run Test
-        run: cargo test
+          args: -- -D warnings
+
+  # Run cargo fmt --all -- --check
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: rustfmt
+          override: true
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
