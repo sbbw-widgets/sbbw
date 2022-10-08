@@ -169,6 +169,7 @@ mod tests {
     use super::*;
 
     #[actix_web::test]
+    #[ignore = "Require Pre-configuration"]
     async fn test_widget_req() -> Result<(), Error> {
         let app = App::new().configure(routes);
         let app = test::init_service(app).await;
