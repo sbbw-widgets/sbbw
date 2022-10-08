@@ -48,9 +48,6 @@ jobs:
         run: |
           Invoke-WebRequest https://go.microsoft.com/fwlink/p/?LinkId=2124703 -OutFile installwebview.exe -UseBasicParsing
           cmd /C start /wait installwebview.exe /silent /install
-      - name: Get current date
-        run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
       - name: Cache cargo registry
         uses: actions/cache@v2.1.4
         with:
@@ -84,7 +81,7 @@ jobs:
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features -D Warnings
+          args: --all-features -- -D Warnings
       - name: Check Format
         run: cargo fmt --all -- --check
       - name: Run Test
