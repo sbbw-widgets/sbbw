@@ -56,22 +56,18 @@ pub fn set_main_brightness(_win: &Window, _name: String, params: &str) -> SbbwRe
 
     match serde_json::from_str::<u32>(params) {
         Ok(value) => {
-            if let Ok(devices) = brightness::blocking::brightness_devices() {
-                if let Some(device) = devices.first() {
-                    if device.set(value).is_ok() {
-                        res.status = StatusCode::OK.as_u16();
-                        res.data = "".to_string();
-                    } else {
-                        res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                        res.data = "Cannot set brightness value".to_string();
-                    }
+            let mut devices = brightness::blocking::brightness_devices();
+            if let Some(device) = devices.next() {
+                if device.unwrap().set(value).is_ok() {
+                    res.status = StatusCode::OK.as_u16();
+                    res.data = "".to_string();
                 } else {
                     res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
                     res.data = "Cannot set brightness value".to_string();
                 }
             } else {
                 res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                res.data = "Cannot get brightness devices".to_string();
+                res.data = "Cannot set brightness value".to_string();
             }
         }
         Err(_) => {
@@ -90,21 +86,15 @@ pub fn set_all_brightness(_win: &Window, _name: String, params: &str) -> SbbwRes
 
     match serde_json::from_str::<u32>(params) {
         Ok(value) => {
-            if let Ok(devices) = brightness::blocking::brightness_devices() {
-                if devices
-                    .iter()
-                    .try_for_each(|device| device.set(value))
-                    .is_ok()
-                {
-                    res.status = StatusCode::OK.as_u16();
-                    res.data = "".to_string();
-                } else {
-                    res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                    res.data = "Cannot set brightness value".to_string();
-                }
+            if brightness::blocking::brightness_devices()
+                .try_for_each(|device| device.unwrap().set(value))
+                .is_ok()
+            {
+                res.status = StatusCode::OK.as_u16();
+                res.data = "".to_string();
             } else {
                 res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                res.data = "Cannot get brightness devices".to_string();
+                res.data = "Cannot set brightness value".to_string();
             }
         }
         Err(_) => {
@@ -118,13 +108,17 @@ pub fn set_all_brightness(_win: &Window, _name: String, params: &str) -> SbbwRes
 }
 
 fn get_all_devices() -> Result<Vec<SbbwBrightnessDevice>, String> {
-    if let Ok(devices) = brightness::blocking::brightness_devices() {
-        let m = devices.iter().map(|dev| SbbwBrightnessDevice {
-            name: dev.device_name().unwrap_or_else(|_| "".to_string()),
-            value: dev.get().unwrap_or_default(),
-        });
-        Ok(m.collect::<Vec<SbbwBrightnessDevice>>())
-    } else {
-        Err("Cannot get brightness devices".to_string())
-    }
+    let m = brightness::blocking::brightness_devices()
+        .map(|dev| {
+            if let Ok(dev) = dev {
+                Some(SbbwBrightnessDevice {
+                    name: dev.device_name().unwrap_or_else(|_| "".to_string()),
+                    value: dev.get().unwrap_or_default(),
+                })
+            } else {
+                None
+            }
+        })
+        .flatten();
+    Ok(m.collect::<Vec<SbbwBrightnessDevice>>())
 }
