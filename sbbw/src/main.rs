@@ -10,14 +10,15 @@ use lazy_static::lazy_static;
 use log::error;
 use sbbw_exec::autostarts;
 use sbbw_widget_conf::{
-    exits_widget, generate_config_sbbw, generate_pid_file, get_config_sbbw, get_pid, get_widgets,
-    get_widgets_path, remove_pid_file, validate_config_toml, SbbwConfig,
+    exits_widget, generate_config_sbbw, get_config_sbbw, get_widgets, get_widgets_path,
+    validate_config_toml, SbbwConfig,
 };
 use std::{
     env,
     process::Command,
     sync::{Arc, Mutex},
 };
+use sysinfo::{System, SystemExt};
 use widget::rpc::routes;
 
 use crate::widget::prelude::listen_keybinds;
@@ -81,21 +82,20 @@ fn main() {
 
         match cmd {
             WidgetCommands::Run => {
-                if get_pid().is_ok() {
-                    println!("{}", "Other Sbbw Daemon is running".red().bold());
-                    std::process::exit(1);
+                {
+                    let s = System::new_all();
+                    let processes = s.processes_by_exact_name("sbbw");
+                    if processes.count() > 1 {
+                        println!("{}", "Other Sbbw Daemon is running".red().bold());
+                        std::process::exit(1);
+                    }
                 }
                 println!("{}", "Sbbw Daemon".green());
                 if !args.no_fork {
                     match fork() {
-                        Ok(Fork::Parent(child)) => {
-                            generate_pid_file(child.to_string());
-                            std::process::exit(0);
-                        }
+                        Ok(Fork::Parent(_)) => std::process::exit(0),
                         _ => println!("Cannot create fork"),
                     }
-                } else {
-                    generate_pid_file(std::process::id().to_string());
                 }
 
                 let conf = conf.clone();
@@ -116,11 +116,8 @@ fn main() {
                     .workers(4)
                     .run();
                 match actix_rt::System::new().block_on(server) {
-                    Ok(_) => remove_pid_file(), // Call when the server is closed
-                    Err(e) => {
-                        remove_pid_file();
-                        println!("Error: {}", e)
-                    }
+                    Ok(_) => {} // Call when the server is closed
+                    Err(e) => println!("Error: {}", e),
                 }
             }
             WidgetCommands::Check { widget_name } => {

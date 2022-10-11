@@ -2378,6 +2378,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ntapi"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc51db7b362b205941f71232e56c625156eb9a929f8cf74a428fd5bc094a4afc"
+dependencies = [
+ "winapi",
+]
+
+[[package]]
 name = "num-traits"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2993,6 +3002,7 @@ dependencies = [
  "sbbw-widget-conf",
  "serde",
  "serde_json",
+ "sysinfo 0.26.4",
  "tokio",
  "tokio-io",
 ]
@@ -3026,7 +3036,7 @@ dependencies = [
  "sbbw-widget-conf",
  "serde",
  "serde_json",
- "sysinfo",
+ "sysinfo 0.25.3",
  "tao",
  "tauri-plugin-vibrancy",
  "url",
@@ -3341,7 +3351,22 @@ dependencies = [
  "cfg-if 1.0.0",
  "core-foundation-sys 0.8.3",
  "libc",
- "ntapi",
+ "ntapi 0.3.7",
+ "once_cell",
+ "rayon",
+ "winapi",
+]
+
+[[package]]
+name = "sysinfo"
+version = "0.26.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7890fff842b8db56f2033ebee8f6efe1921475c3830c115995552914fb967580"
+dependencies = [
+ "cfg-if 1.0.0",
+ "core-foundation-sys 0.8.3",
+ "libc",
+ "ntapi 0.4.0",
  "once_cell",
  "rayon",
  "winapi",

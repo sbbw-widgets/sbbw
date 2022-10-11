@@ -47,27 +47,6 @@ pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> 
     validate_config_from_string(conf_str.as_str())
 }
 
-pub fn get_pid() -> std::io::Result<String> {
-    let mut config = get_config_path();
-    config.push("pid");
-
-    fs::read_to_string(config)
-}
-
-pub fn generate_pid_file(pid: String) -> bool {
-    let mut config = get_config_path();
-    config.push("pid");
-
-    fs::write(config.to_str().unwrap(), pid.as_str()).is_ok()
-}
-
-pub fn remove_pid_file() {
-    let mut config = get_config_path();
-    config.push("pid");
-
-    fs::remove_file(config).unwrap()
-}
-
 pub fn generate_config_sbbw(cfg: SbbwConfig) -> Result<(), std::io::Error> {
     let mut path = get_config_path();
     path.push("config.toml");
