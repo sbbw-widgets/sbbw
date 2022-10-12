@@ -45,8 +45,8 @@ pub fn process_arg(conf: &mut SbbwConfig, cmd: &ShortcutsAction) {
 fn add_shortcut(conf: &mut SbbwConfig, shortcut: KeyboardShortcuts) {
     conf.shortcuts.push(shortcut);
     if generate_config_sbbw(conf.clone()).is_err() {
-        println!("\n{}", "Cannot update your configuration".red());
+        println!("\n\t{}", "Cannot update your configuration".red());
         std::process::exit(1);
     }
-    println!("\n{}", "Succes add the shortcut".green());
+    println!("\n\t{}", "Succes add the shortcut".green());
 }

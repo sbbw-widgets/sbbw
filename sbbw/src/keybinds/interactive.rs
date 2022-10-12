@@ -18,7 +18,7 @@ where
     let mut answer = String::new();
     let mut stdin = io::stdin();
     while !is_valid {
-        print!("{}: ", question.bright_blue());
+        print!("\t{}: ", question.bright_blue());
         let mut buf = [0u8; 1024];
         io::stdout().flush().unwrap();
         if let Ok(c) = stdin.read(&mut buf) {
@@ -26,10 +26,10 @@ where
                 answer = String::from_utf8(buf[..c - 1].to_vec()).unwrap();
                 is_valid = validation(answer.trim());
             } else {
-                println!("{}", "You need write something".magenta());
+                println!("\t{}", "You need write something".magenta());
             }
         } else {
-            println!("An error ocurred");
+            println!("\tAn error ocurred");
         }
     }
     T::from_str(&answer)
@@ -51,7 +51,7 @@ pub fn get_keys(conf: &SbbwConfig) -> Vec<String> {
 
     loop {
         if show_instruction {
-            print!("\nPress the keys for the keyboard shortcut: ");
+            print!("\n\tPress the keys for the keyboard shortcut: ");
             io::stdout().flush().unwrap();
         }
         std::thread::sleep(Duration::from_millis(100));
@@ -60,12 +60,12 @@ pub fn get_keys(conf: &SbbwConfig) -> Vec<String> {
             println!("{keys:?}");
             io::stdout().flush().unwrap();
             if shortcuts.contains(&keys) {
-                println!("{}", "This shortcuts alredy exists".magenta());
+                println!("\t{}", "This shortcuts alredy exists".magenta());
                 show_instruction = true;
                 continue;
             }
             let ok = ask::<MyBool>("Are these keys OK? [Yes|No]", accept)
-                .map_err(|e| println!("\n{}", e.magenta()))
+                .map_err(|e| println!("\n\t{}", e.magenta()))
                 .unwrap_or(MyBool(false));
             if !ok.0 {
                 show_instruction = true;
