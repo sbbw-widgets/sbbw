@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Default, Deserialize, Debug, PartialEq, Eq)]
@@ -8,6 +10,20 @@ pub enum RpcAction {
     Test,
     #[default]
     Toggle,
+}
+
+impl FromStr for RpcAction {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "open" => Ok(Self::Open),
+            "close" => Ok(Self::Close),
+            "test" => Ok(Self::Test),
+            "toggle" => Ok(Self::Toggle),
+            x => Err(format!("\"{x}\" not recognized"))
+        }
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]

@@ -6,6 +6,7 @@ use cmd::{
 };
 use colored::*;
 use fork::{fork, Fork};
+use keybinds::process_arg;
 use lazy_static::lazy_static;
 use log::error;
 use sbbw_exec::autostarts;
@@ -24,6 +25,7 @@ use widget::rpc::routes;
 use crate::widget::prelude::listen_keybinds;
 
 mod cmd;
+mod keybinds;
 mod widget;
 
 const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
@@ -158,6 +160,7 @@ fn main() {
                     Ok(_) => println!("Success Widget installed"),
                 }
             }
+            WidgetCommands::Shortcuts { action } => process_arg(conf.as_mut().unwrap(), action),
             x => match to_request(x, format!("http://localhost:{}", port)) {
                 Ok(req) => {
                     let client = reqwest::Client::new();
