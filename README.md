@@ -179,15 +179,4 @@ This is a list of commands, but this only have two parametters:
 You can see more details on [wiki page](https://github.com/SergioRibera/sbbw/wiki)
 
 ### TODO
-- [ ] Sbbw daemon detect shortcuts and widgets configurable shortcuts
-- [ ] MacOS Stick windows Support
-- [ ] More Javascript Methods (On Demmand)
-- [ ] implement media controller built-in
-- [x] ~~Test widget (using web tools)~~
-- [x] ~~Lua support natively (Rejected)~~
-- [x] ~~Command to install widget easiest~~
-- [x] ~~Javascript variables, like as SO, Widget Name, and more~~
-- [x] ~~Nodejs module bridgen api~~
-- [x] ~~Implement common commands natively~~
-- [x] ~~Refactor Code (In Progress)~~
-- [ ] Your Suggestion :D
+> NOTE: Moved to [TODO.md](TODO.md)
