@@ -28,6 +28,7 @@ In this list you will find all the tasks that are being developed and those that
     - [ ] Comunication between widgets
     - [ ] A widget can launch another widget and get a response from it
     - [ ] Widget request exit to daemon and daemon aprove close (Related to the above)
+    - [ ] Find better solution for launch command using shortcuts
 
 - [ ] NodeJs Module
     - [ ] Fix issues using the module (When some functions are called, they do not have an expected behavior)
@@ -35,7 +36,6 @@ In this list you will find all the tasks that are being developed and those that
 ### In Progress
 
 - [ ] ~~Refactor Code~~
-- [x] Sbbw daemon detect shortcuts and widgets configurable shortcuts
 
 ### Done ✓
 
@@ -45,6 +45,7 @@ In this list you will find all the tasks that are being developed and those that
 - [x] ~~Nodejs module bridgen api~~
 - [x] ~~implement media controller built-in (linux)~~
 - [x] ~~Implement common commands natively (bat, brightness, sys_info, widget, media, wifi)~~
+- [x] ~~Sbbw daemon detect shortcuts and widgets configurable shortcuts~~
 
 ### Rejected
 
