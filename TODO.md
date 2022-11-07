@@ -35,7 +35,7 @@ In this list you will find all the tasks that are being developed and those that
 ### In Progress
 
 - [ ] ~~Refactor Code~~
-- [ ] Sbbw daemon detect shortcuts and widgets configurable shortcuts
+- [x] Sbbw daemon detect shortcuts and widgets configurable shortcuts
 
 ### Done ✓
 

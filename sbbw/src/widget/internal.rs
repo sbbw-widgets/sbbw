@@ -62,16 +62,19 @@ fn loop_listen_keybinds(cfg: SbbwConfig) {
                         let mut widgets = WIDGETS.lock().unwrap();
                         open_widget(&mut widgets, &(widget_name, None), action, args, url)
                             .unwrap_or_default();
+                        thread::sleep(Duration::from_millis(1500));
                     }
                     RpcAction::Close => {
                         let mut widgets = WIDGETS.lock().unwrap();
                         let widget_name = widget_name.clone();
                         close_widget(&mut widgets, &(widget_name, None)).unwrap_or_default();
+                        thread::sleep(Duration::from_millis(1500));
                     }
                     RpcAction::Toggle => {
                         let mut widgets = WIDGETS.lock().unwrap();
                         toggle_widget(&mut widgets, &(widget_name, None), action, args, url)
                             .unwrap_or_default();
+                        thread::sleep(Duration::from_millis(1500));
                     }
                 }
             }
