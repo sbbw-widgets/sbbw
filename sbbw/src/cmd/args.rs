@@ -3,7 +3,7 @@ use std::{ops::Deref, sync::Mutex};
 use clap::{AppSettings, Parser, Subcommand};
 use clap_verbosity_flag::{InfoLevel, Verbosity};
 use lazy_static::lazy_static;
-use sbbw_widget_conf::{get_widgets, RpcDataRequest, WidgetConfig, RpcAction};
+use sbbw_widget_conf::{get_widgets, RpcAction, RpcDataRequest, WidgetConfig};
 
 use crate::{AUTHORS, DESCRIPTION};
 
@@ -63,8 +63,8 @@ pub enum WidgetCommands {
     },
     Shortcuts {
         #[clap(subcommand)]
-        action: ShortcutsAction
-    }
+        action: ShortcutsAction,
+    },
 }
 
 #[derive(Subcommand, Default, Debug, Clone)]
@@ -81,7 +81,7 @@ pub enum ShortcutsAction {
         widget_args: Option<String>,
         #[clap(help = "Keys to link action")]
         keys: Vec<String>,
-    }
+    },
 }
 
 #[derive(Subcommand, Default, Debug, Clone)]

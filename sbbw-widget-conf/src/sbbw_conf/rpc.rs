@@ -21,7 +21,7 @@ impl FromStr for RpcAction {
             "close" => Ok(Self::Close),
             "test" => Ok(Self::Test),
             "toggle" => Ok(Self::Toggle),
-            x => Err(format!("\"{x}\" not recognized"))
+            x => Err(format!("\"{x}\" not recognized")),
         }
     }
 }
