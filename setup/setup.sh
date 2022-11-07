@@ -18,14 +18,14 @@ sleep 2
 
 if [[ -f "$PATH_TO_INSTALL/sbbw" ]]; then
     echo -e "${RED}sbbw already installed${NC}"
-    exit 1
+    echo -e "${BLUE}Updating ...${NC}"
 fi
 
-if [[ ! -f "sbbw" ]]; then
+if [[ ! -f "./sbbw" ]]; then
     echo -e "${RED}sbbw binary not found${NC}"
     exit 1
 fi
-if [[ ! -f "sbbw-widget" ]]; then
+if [[ ! -f "./sbbw-widget" ]]; then
     echo -e "${RED}sbbw-widget binary not found${NC}"
     exit 1
 fi

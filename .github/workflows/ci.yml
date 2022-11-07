@@ -1,6 +1,14 @@
 name: CI
 on:
   push:
+    branches:
+      - main
+      - dev
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "setup/**"
+      - "sbbw_node/**"
   pull_request:
     branches:
       - main

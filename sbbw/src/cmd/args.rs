@@ -3,7 +3,7 @@ use std::{ops::Deref, sync::Mutex};
 use clap::{AppSettings, Parser, Subcommand};
 use clap_verbosity_flag::{InfoLevel, Verbosity};
 use lazy_static::lazy_static;
-use sbbw_widget_conf::{get_widgets, RpcDataRequest, WidgetConfig};
+use sbbw_widget_conf::{get_widgets, RpcAction, RpcDataRequest, WidgetConfig};
 
 use crate::{AUTHORS, DESCRIPTION};
 
@@ -60,6 +60,27 @@ pub enum WidgetCommands {
     Check {
         #[clap(validator = validate_widgets)]
         widget_name: String,
+    },
+    Shortcuts {
+        #[clap(subcommand)]
+        action: ShortcutsAction,
+    },
+}
+
+#[derive(Subcommand, Default, Debug, Clone)]
+pub enum ShortcutsAction {
+    #[default]
+    List,
+    Interactive,
+    Add {
+        #[clap(help = "Action to trigger when keys has pressed")]
+        action: RpcAction,
+        #[clap(help = "Widget to call")]
+        widget: String,
+        #[clap(long, short, help = "Arguments for send to trigger")]
+        widget_args: Option<String>,
+        #[clap(help = "Keys to link action")]
+        keys: Vec<String>,
     },
 }
 
