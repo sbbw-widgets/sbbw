@@ -3,8 +3,8 @@ use colored::Colorize;
 use sbbw_widget_conf::{generate_config_sbbw, KeyboardShortcuts, SbbwConfig};
 
 use interactive::get_shortcut_interactive;
-mod interactive;
-mod validations;
+pub mod interactive;
+pub mod validations;
 
 pub fn process_arg(conf: &mut SbbwConfig, cmd: &ShortcutsAction) {
     match cmd {
