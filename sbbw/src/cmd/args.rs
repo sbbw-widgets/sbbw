@@ -28,6 +28,10 @@ pub struct ArgOpt {
 pub enum WidgetCommands {
     #[clap(help = "This run widget server and all features")]
     Run,
+    #[clap(help = "Create new widget project from template")]
+    New {
+        name: Option<String>,
+    },
     Install {
         #[clap(help = "Repository origin, ex: User/RepoName")]
         repo: String,
