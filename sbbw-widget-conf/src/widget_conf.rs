@@ -1,3 +1,5 @@
+use std::{fs, path::PathBuf, str::FromStr};
+
 use colored::Colorize;
 use serde::{
     de::{self, Deserializer},
@@ -5,6 +7,14 @@ use serde::{
 };
 
 use crate::AutoStartCommand;
+
+pub fn write_widget_conf(path: &mut PathBuf, conf: WidgetConfig) {
+    if !path.ends_with("config.toml") {
+        path.push("config.toml");
+    }
+    let toml = toml::to_string(&conf).unwrap();
+    fs::write(path, toml).expect("Failed to create widget config");
+}
 
 fn deserialize_widget_size<'de, D>(de: D) -> Result<WidgetSize, D::Error>
 where
@@ -51,6 +61,28 @@ impl Serialize for WidgetSize {
 impl Default for WidgetSize {
     fn default() -> Self {
         WidgetSize::Max
+    }
+}
+
+impl FromStr for WidgetSize {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_ascii_lowercase().as_str() {
+            "max" => Ok(WidgetSize::Max),
+            "full" => Ok(WidgetSize::Full),
+            _ => {
+                let v = s.parse::<f64>();
+                if v.is_err() {
+                    return Err(format!(
+                        "[{}] Invalid widget size (Cannot convert into f64): {}",
+                        "Error".red().bold(),
+                        s
+                    ));
+                }
+                Ok(WidgetSize::Value(v.unwrap()))
+            } // _ => Err(serde::de::Error::custom("error trying to deserialize rotation policy config"))
+        }
     }
 }
 
