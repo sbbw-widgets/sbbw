@@ -2,7 +2,7 @@
 use actix_web::{App, HttpServer};
 use cmd::{
     args::{get_args, to_request, WidgetCommands},
-    install::install_widget,
+    install::install_widget, new_widget::create_widget,
 };
 use colored::*;
 use fork::{fork, Fork};
@@ -160,6 +160,7 @@ fn main() {
                     Ok(_) => println!("Success Widget installed"),
                 }
             }
+            WidgetCommands::New { name } => create_widget(name),
             WidgetCommands::Shortcuts { action } => process_arg(conf.as_mut().unwrap(), action),
             x => match to_request(x, format!("http://localhost:{}", port)) {
                 Ok(req) => {
