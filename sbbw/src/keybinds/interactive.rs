@@ -10,25 +10,37 @@ use sbbw_widget_conf::{get_widgets, KeyboardShortcuts, RpcAction, SbbwConfig, Wi
 
 use super::validations::{accept, is_rpc_action, is_widget, MyBool};
 
-pub fn ask<T>(question: &str, validation: impl Fn(&str) -> bool) -> Result<T, T::Err>
+pub fn ask<T>(question: &str, require: bool, validation: impl Fn(&str) -> bool) -> Result<T, T::Err>
 where
     T: FromStr,
 {
     let mut is_valid = false;
     let mut answer = String::new();
     let mut stdin = io::stdin();
+    let mut prefix = String::from_utf8("\t".into()).unwrap();
+
+    if require {
+        prefix.push_str(format!("({}) ", "*".red()).as_str());
+    }
+
     while !is_valid {
-        print!("\t{}: ", question.bright_blue());
-        let mut buf = [0u8; 1024];
+        print!("{}{}: ", prefix, question.bright_blue());
         io::stdout().flush().unwrap();
+        let mut buf = [0u8; 1024];
         if let Ok(c) = stdin.read(&mut buf) {
             if c > 0 {
                 answer = String::from_utf8(buf[..c - 1].to_vec()).unwrap();
-                is_valid = validation(answer.trim());
+                is_valid = validation(answer.trim()) || !require;
             } else {
+                if !require {
+                    break;
+                }
                 println!("\t{}", "You need write something".magenta());
             }
         } else {
+            if !require {
+                break;
+            }
             println!("\tAn error ocurred");
         }
     }
@@ -64,7 +76,7 @@ pub fn get_keys(conf: &SbbwConfig) -> Vec<String> {
                 show_instruction = true;
                 continue;
             }
-            let ok = ask::<MyBool>("Are these keys OK? [Yes|No]", accept)
+            let ok = ask::<MyBool>("Are these keys OK? [Yes|No]", false, accept)
                 .map_err(|e| println!("\n\t{}", e.magenta()))
                 .unwrap_or(MyBool(false));
             if !ok.0 {
@@ -81,17 +93,23 @@ pub fn get_keys(conf: &SbbwConfig) -> Vec<String> {
 pub fn get_shortcut_interactive(conf: &SbbwConfig) -> KeyboardShortcuts {
     let (names, _): (Vec<String>, Vec<WidgetConfig>) = get_widgets().into_iter().unzip();
     println!("{}\n", "Starting to get shortcuts".cyan());
-    let action =
-        ask::<RpcAction>("Action to be taken [open|close|toggle|test]", is_rpc_action).unwrap();
+    let action = ask::<RpcAction>(
+        "Action to be taken [open|close|toggle|test]",
+        true,
+        is_rpc_action,
+    )
+    .unwrap();
     let keys = get_keys(conf);
-    let name = ask::<String>("Which widget do we call?", |a| is_widget(a, &names)).unwrap();
+    let name = ask::<String>("Which widget do we call?", true, |a| is_widget(a, &names)).unwrap();
     let url: Option<String> = ask::<String>(
         "You have your own url (perfect for testing, this is optional, you can leave it empty)",
+        false,
         |_| true,
     )
     .ok();
     let args = ask::<String>(
         "Do you need to pass arguments to the widget? (Optional)",
+        false,
         |_| true,
     )
     .unwrap();
