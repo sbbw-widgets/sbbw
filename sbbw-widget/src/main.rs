@@ -1,4 +1,4 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#![feature(proc_macro_hygiene, decl_macro, is_some_and)]
 #![allow(unused_imports)]
 #![cfg_attr(
     all(not(debug_assertions), target_os = "windows"),

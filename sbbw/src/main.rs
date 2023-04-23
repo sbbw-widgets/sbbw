@@ -1,4 +1,4 @@
-#![feature(proc_macro_hygiene, decl_macro, str_split_as_str)]
+#![feature(proc_macro_hygiene, decl_macro)]
 use actix_web::{App, HttpServer};
 use cmd::{
     args::{get_args, to_request, WidgetCommands},
