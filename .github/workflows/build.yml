@@ -31,7 +31,7 @@ jobs:
         if: matrix.platform.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.0 libgtksourceview-3.0-dev libappindicator3-dev libgtk-3-0
+          sudo apt-get install -y webkit2gtk-4.0 libgtksourceview-3.0-dev libappindicator3-dev libgtk-3-0 libiw-dev
       - name: install webview2 (windows only)
         if: matrix.platform.os == 'windows-latest'
         shell: pwsh
