@@ -1,4 +1,4 @@
-allow-branch = ["main", "dev"]
+allow-branch = ["main", "dev", "feature/*"]
 sign-commit = true
 sign-tag = true
 push-remote = "origin"
