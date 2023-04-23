@@ -1,6 +1,6 @@
 [package]
 name = "sbbw-widget"
-version = "0.1.2"
+version = "0.1.3-alpha.1"
 description = "A binary to show Widget as Window"
 authors = ["Sergio Ribera"]
 license = ""
