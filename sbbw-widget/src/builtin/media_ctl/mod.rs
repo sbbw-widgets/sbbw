@@ -1,6 +1,5 @@
 use std::time::Duration;
 
-use mpris::LoopStatus;
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_os = "linux")]
