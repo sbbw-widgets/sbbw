@@ -1,6 +1,6 @@
 allow-branch = ["main", "dev", "feature/*"]
-sign-commit = true
-sign-tag = true
+sign-commit = false
+sign-tag = false
 push-remote = "origin"
 release = true
 publish = false
