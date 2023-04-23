@@ -84,3 +84,4 @@ jobs:
         with:
           body_path: CHANGELOG.md
           files: sbbw-${{ matrix.platform.target }}.zip
+          prerelease: ${{ contains(github.ref_name, 'a') }}
