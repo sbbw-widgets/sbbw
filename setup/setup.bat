@@ -3,7 +3,7 @@
 goto check_Permissions
 
 :check_Permissions
-    echo Administrative permissions required. Detecting permissions...
+    echo Run as administrator. Detecting permissions...
 
     net session >nul 2>&1
     if not %errorLevel% == 0 (
@@ -20,7 +20,7 @@ echo Installing sbbw
 timeout /t 2 > NUL
 
 if exist "%PATH_TO_INSTALL%\sbbw.exe" (
-    echo sbbw already installed
+    echo sbbw is already installed
     echo Updating sbbw
 )
 if not exist "%CURRENT_DIR%\sbbw.exe" (
@@ -47,6 +47,6 @@ copy "%CURRENT_DIR%\sbbw-widget.exe" "%PATH_TO_INSTALL%"
 echo [ OK ] Sbbw Installed
 timeout /t 2 > NUL
 
-echo [ OK ] Done, you can close this
+echo [ OK ] Done, now you can close this
 
 pause >nul
