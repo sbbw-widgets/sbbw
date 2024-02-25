@@ -1,7 +1,8 @@
 # Sbbw Contributing Guide
 
 ### Contributing
-- **sbbw**: this is the daemon, it is in charge of managing the widgets that are running, it is in charge of launching and closing the widgets based on commands or shortcuts.
-- **sbbw-exec**: It is in charge of doing what is related to the first launching of the widget, such as generating the .lock or executing the autostart.
-- **sbbw-widget**: It is the binary of the widget, this is the one that renders and communicates the web interface with the built-in functions, like detecting the battery, or controlling the multimedia.
-- **sbbw-widget-conf**: Contains everything related to the widget manifest file and the sbbw configuration structures in general, as well as exports and validation.
+
+- **ssbw**: ssbw's main daemon manages all the currently running widgets by starting/closing them through commands or key shortcuts.
+- **sbbw-exec**: It handles widget startup, as well, generating the lockfile (.lock) and autostarting.
+- **sbbw-widget**: The widget's binary that renders and coordinates the widget's web interface with built-in commands (such as detecting the battery percentage or handling the multimedia interface).
+- **sbbw-widget-conf**: Contains the widget's configuration manifest file and its self-export content & validations
