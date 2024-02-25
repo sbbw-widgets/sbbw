@@ -1,52 +1,54 @@
 # Sbbw TODO list
-In this list you will find all the tasks that are being developed and those that are still to start, I invite you to see each one and see if you can collaborate in any way in any of them
+
+This list contains tasks currently under development, as well as tasks that are still in the backlog. I kindly request you to review the task list to catch up as much work progress as possible. Should you be interested in contributing, your participation would be greatly appreciated.
 
 ### Contributing
-- **sbbw**: this is the daemon, it is in charge of managing the widgets that are running, it is in charge of launching and closing the widgets based on commands or shortcuts.
-- **sbbw-exec**: It is in charge of doing what is related to the first launching of the widget, such as generating the .lock or executing the autostart.
-- **sbbw-widget**: It is the binary of the widget, this is the one that renders and communicates the web interface with the built-in functions, like detecting the battery, or controlling the multimedia.
-- **sbbw-widget-conf**: Contains everything related to the widget manifest file and the sbbw configuration structures in general, as well as exports and validation.
+
+- **ssbw**: ssbw's main daemon manages all the currently running widgets by starting/closing them through commands or key shortcuts.
+- **sbbw-exec**: It handles widget startup, as well, generating the lockfile (.lock) and autostarting.
+- **sbbw-widget**: The widget's binary that renders and coordinates the widget's web interface with built-in commands (such as detecting the battery percentage or handling the multimedia interface).
+- **sbbw-widget-conf**: Contains the widget's configuration manifest file and its self-export content & validations
 
 ### TODO
 
 - [ ] MacOS
-    - [ ] Stick windows Support
-    - [ ] Implement brightness
-    - [ ] Implement media controll
-    - [ ] Implement wifi (get data)
+    - [ ] Implement support for macOS's pin window on top feature
+    - [ ] Implement brightness handling
+    - [ ] Implement media control handling
+    - [ ] Implement wifi interface support (to get network data)
 
 - [ ] Windows
-    - [ ] Implement media controll
-    - [ ] Implement wifi (get data)
+    - [ ] Implement media control handling
+    - [ ] Implement wifi interface support (to get network data)
 
 - [ ] Linux
     - [ ] TODO (xd)
 
 - [ ] General
-    - [ ] Sbbw daemon detect shortcuts and widgets configurable shortcuts
-    - [ ] Implement support for multiple widgets of the same open type
-    - [ ] Comunication between widgets
-    - [ ] A widget can launch another widget and get a response from it
-    - [ ] Widget request exit to daemon and daemon aprove close (Related to the above)
-    - [ ] Find better solution for launch command using shortcuts
+    - [ ] Implement shortcut detection & widget's configurable shortcut loading into sbbw daemon
+    - [ ] Implement widget multi-instance support
+    - [ ] Implement widget comunication system
+    - [ ] Implement nested widget calling/launching
+    - [ ] Implement widget closure handling (daemon should approve when widget's about to close) in sbbw daemon (It regards to the task below)
+    - [ ] SPIKE: Look into finding better approaches for executing commands by using key shortcuts.
 
 - [ ] NodeJs Module
-    - [ ] Fix issues using the module (When some functions are called, they do not have an expected behavior)
+    - [ ] Fix module issues (Calling some functions might end in unexpected behavior)
 
 ### In Progress
 
-- [ ] ~~Refactor Code~~
+- [ ] Code refactor
 
 ### Done ✓
 
-- [x] ~~Test widget (using web tools)~~
-- [x] ~~Command to install widget easiest~~
-- [x] ~~Javascript variables, like as SO, Widget Name, and more~~
-- [x] ~~Nodejs module bridgen api~~
-- [x] ~~implement media controller built-in (linux)~~
-- [x] ~~Implement common commands natively (bat, brightness, sys_info, widget, media, wifi)~~
-- [x] ~~Sbbw daemon detect shortcuts and widgets configurable shortcuts~~
+- [x] ~~Widget unit testing using web tools~~
+- [x] ~~Command to install widgets the easy way~~
+- [x] ~~Javascript environment variables per widget (such as as OS information, Widget Name, and more)~~
+- [x] ~~NodeJS module package bridge api~~
+- [x] ~~implement built-in media controller (linux-only at the moment)~~
+- [x] ~~Implement support for common commands (bat, brightness, sys_info, widget, media, wifi) natively~~
+- [x] ~~Sbbw daemon detecting shortcuts and widgets configurable shortcuts~~
 
 ### Rejected
 
-- [x] ~~Lua support natively~~
+- [x] ~~Lua native support~~
