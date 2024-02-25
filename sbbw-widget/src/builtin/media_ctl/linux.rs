@@ -12,7 +12,7 @@ use crate::{
 
 pub fn is_player_active(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request check if Player active");
+    trace!("Requesting to check if player is currently active");
 
     if let Some(player) = get_player(&mut res) {
         let value = player.is_running();
@@ -25,7 +25,7 @@ pub fn is_player_active(_win: &Window, _name: String, _params: &str) -> SbbwResp
 
 pub fn set_volume(_win: &Window, _name: String, params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request change volume");
+    trace!("Requesting to change volume");
 
     if let Some(volume) = get_from_str::<f64>(&mut res, params) {
         if let Some(player) = get_player(&mut res) {
@@ -44,7 +44,7 @@ pub fn set_volume(_win: &Window, _name: String, params: &str) -> SbbwResponse {
 
 pub fn set_play_pause(_win: &Window, _name: String, params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request play/pause");
+    trace!("Requesting to play/pause media");
 
     if let Some(play) = get_from_str::<bool>(&mut res, params) {
         if let Some(player) = get_player(&mut res) {
@@ -55,11 +55,11 @@ pub fn set_play_pause(_win: &Window, _name: String, params: &str) -> SbbwRespons
                         res.data = "".to_string();
                     } else {
                         res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                        res.data = "Error to set play".to_string();
+                        res.data = "Error to send play event".to_string();
                     }
                 } else {
                     res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                    res.data = "Cannot set play".to_string();
+                    res.data = "Cannot send play event".to_string();
                 }
             } else if player.can_pause().unwrap_or(false) {
                 if player.checked_pause().is_ok_and(|v| v) {
@@ -67,11 +67,11 @@ pub fn set_play_pause(_win: &Window, _name: String, params: &str) -> SbbwRespons
                     res.data = "".to_string();
                 } else {
                     res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                    res.data = "Error to set pause".to_string();
+                    res.data = "Error to send pause event".to_string();
                 }
             } else {
                 res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                res.data = "Cannot set pause".to_string();
+                res.data = "Cannot send pause event".to_string();
             }
         }
     }
@@ -81,7 +81,7 @@ pub fn set_play_pause(_win: &Window, _name: String, params: &str) -> SbbwRespons
 
 pub fn set_next(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request next");
+    trace!("Requesting next media");
 
     if let Some(player) = get_player(&mut res) {
         if player.can_go_next().unwrap_or(false) {
@@ -96,7 +96,7 @@ pub fn set_next(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
                 }
             } else {
                 res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                res.data = "Error to set next".to_string();
+                res.data = "Error to get next track".to_string();
             }
         } else {
             res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
@@ -109,7 +109,7 @@ pub fn set_next(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
 
 pub fn set_prev(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request previous");
+    trace!("Requesting previous media");
 
     if let Some(player) = get_player(&mut res) {
         if player.can_go_previous().unwrap_or(false) {
@@ -124,7 +124,7 @@ pub fn set_prev(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
                 }
             } else {
                 res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-                res.data = "Error to set next".to_string();
+                res.data = "Error to get previous media".to_string();
             }
         } else {
             res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
@@ -137,7 +137,7 @@ pub fn set_prev(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
 
 pub fn get_volume(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request change player volume");
+    trace!("Requesting to change player's volume");
 
     if let Some(player) = get_player(&mut res) {
         if let Ok(value) = player.get_volume() {
@@ -145,7 +145,7 @@ pub fn get_volume(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
             res.data = serde_json::to_string(&value).unwrap_or_else(|_| "0.0".to_string());
         } else {
             res.status = StatusCode::INTERNAL_SERVER_ERROR.as_u16();
-            res.data = "Cannot get volume".to_string();
+            res.data = "Cannot set player's volume".to_string();
         }
     }
 
@@ -160,14 +160,14 @@ where
         Some(value)
     } else {
         res.status = StatusCode::BAD_REQUEST.as_u16();
-        res.data = "Cannot get parametter".to_string();
+        res.data = "Cannot get parameter".to_string();
         None
     }
 }
 
 pub fn get_state(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request get current media player state");
+    trace!("Requesting to get current media player state");
 
     if let Some(player) = get_player(&mut res) {
         let state = internal_get_state(&player);

@@ -32,7 +32,7 @@ fn generate_hash_from_file(path: PathBuf) -> Result<String, Box<dyn Error>> {
 }
 
 pub fn exec_command(pwd: String, params: Vec<String>) -> Result<String, String> {
-    let file = params.first().expect("The arguments cannot by empty");
+    let file = params.first().expect("Arguments cannot be empty");
     println!("{}", file);
     let mut args = params[1..].to_vec();
     if file.starts_with("./") {

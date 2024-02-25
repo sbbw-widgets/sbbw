@@ -97,7 +97,7 @@ fn main() {
             .with_ipc_handler(move |win, msg| {
                 let mut response = SbbwResponse::default();
                 let params: Option<Params> = parse_params(&mut response, msg);
-                info!("Params from frontend parsed: {:?}", &params);
+                info!("Frontend params have been parsed: {:?}", &params);
 
                 if response.status != 0 {
                     response = process_ipc(win, widget_name.clone(), params.as_ref().unwrap());
@@ -107,7 +107,7 @@ fn main() {
                     let webviews = ref_webview.borrow();
                     let webview = webviews.as_ref().unwrap();
                     let response_json = serde_json::to_string(&response).unwrap();
-                    trace!("Response for frontend: {}", &response_json);
+                    trace!("Frontend response: {}", &response_json);
                     let js = format!(
                         r#"window.external.rpc._result({}, {})"#,
                         params.unwrap().method_id,
@@ -135,7 +135,7 @@ fn main() {
     } else {
         println!(
             "{}",
-            "Widget {} not found or not have config.toml file"
+            "Widget {} not found or doesn't have config.toml file"
                 .red()
                 .replace("{}", &args.widget_name.yellow().bold())
         );

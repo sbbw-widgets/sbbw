@@ -15,7 +15,7 @@ pub struct WirelessInfo {
 }
 
 pub fn get_wifi_info(_win: &Window, _name: String, ssid: &str) -> SbbwResponse {
-    trace!("Request get wifi information");
+    trace!("Requesting wifi information");
 
     let info = get_wireless_info(ssid.to_string()).unwrap();
     let info = WirelessInfo {
