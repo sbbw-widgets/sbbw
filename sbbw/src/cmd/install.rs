@@ -99,18 +99,18 @@ pub fn install_widget(cmd: WidgetCommands) -> Result<(), String> {
                 } else {
                     let state = state.borrow_mut();
                     if let Some(pb) = &state.progress_bar {
-                        pb.finish_with_message("Widget installed");
+                        pb.finish_with_message("Widget has been installed");
                     }
                     autostarts();
                     Ok(())
                 }
             } else {
-                Err("Widget alredy exists".to_string())
+                Err("The widget already exists".to_string())
             }
         } else {
-            Err("Repo parameter has no format, check --help".to_string())
+            Err("Invalid repo parameter format, check --help".to_string())
         }
     } else {
-        Err("Install command is invalid, check --help".to_string())
+        Err("Invalid install parameter format, check --help".to_string())
     }
 }

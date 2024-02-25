@@ -9,7 +9,7 @@ NC='\033[0m' # No Colors
 PATH_TO_INSTALL="/usr/local/bin"
 
 if [[ $(id -u) -ne 0 ]]; then
-    echo -e "${RED}Please run as root${NC}"
+    echo -e "${RED}Please run this script with root privileges${NC}"
     exit 1
 fi
 
@@ -17,7 +17,7 @@ echo -e "${BLUE}Installing sbbw${NC}"
 sleep 2
 
 if [[ -f "$PATH_TO_INSTALL/sbbw" ]]; then
-    echo -e "${RED}sbbw already installed${NC}"
+    echo -e "${RED}sbbw is already installed${NC}"
     echo -e "${BLUE}Updating ...${NC}"
 fi
 
@@ -32,12 +32,12 @@ fi
 
 chmod +x sbbw
 chmod +x sbbw-widget
-echo -e "[ ${GREEN}✓${NC} ] ${GREEN}Made executable${NC}"
+echo -e "[ ${GREEN}✓${NC} ] ${GREEN}executable created${NC}"
 
 sleep 2
 
 cp {sbbw,sbbw-widget} $PATH_TO_INSTALL
-echo -e "[ ${GREEN}✓${NC} ] ${GREEN}Sbbw Installed${NC}"
+echo -e "[ ${GREEN}✓${NC} ] ${GREEN}Sbbw is now installed${NC}"
 sleep 2
 
 echo -e "[ ${GREEN}✓${NC} ] ${GREEN}Done${NC}"

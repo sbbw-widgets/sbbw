@@ -27,7 +27,7 @@ struct SbbwWidgetInfo {
 pub fn info(_win: &Window, name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
     let args = Args::parse();
-    trace!("Request Widget data");
+    trace!("Request widget data");
 
     let info = SbbwWidgetInfo {
         name,
@@ -42,7 +42,7 @@ pub fn info(_win: &Window, name: String, _params: &str) -> SbbwResponse {
 
 pub fn move_window(win: &Window, _name: String, params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request Widget move position: {:?}", params);
+    trace!("Request widget to move position: {:?}", params);
 
     match serde_json::from_str::<SbbwWidgetVectorParam>(params) {
         Ok(value) => {
@@ -55,9 +55,9 @@ pub fn move_window(win: &Window, _name: String, params: &str) -> SbbwResponse {
             res.data = "".to_string();
         }
         Err(_) => {
-            error!("Bad params");
+            error!("Invalid params");
             res.status = StatusCode::BAD_REQUEST.as_u16();
-            res.data = "This require X and Y as param".to_string();
+            res.data = "This requires both X and Y axis coordinates to be passed as params".to_string();
         }
     }
 
@@ -66,7 +66,7 @@ pub fn move_window(win: &Window, _name: String, params: &str) -> SbbwResponse {
 
 pub fn resize_window(win: &Window, _name: String, params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request Widget Resize: {:?}", params);
+    trace!("Request widget resize: {:?}", params);
 
     match serde_json::from_str::<SbbwWidgetVectorParam>(params) {
         Ok(value) => {
@@ -82,7 +82,7 @@ pub fn resize_window(win: &Window, _name: String, params: &str) -> SbbwResponse 
         Err(_) => {
             error!("Bad params");
             res.status = StatusCode::BAD_REQUEST.as_u16();
-            res.data = "This require X and Y as param".to_string();
+            res.data = "This requires both X and Y axis coordinates to be passed as params".to_string();
         }
     }
 

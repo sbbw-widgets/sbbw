@@ -49,7 +49,7 @@ fn open_widget_rpc(
     data: Json<RpcDataRequest>,
 ) -> HttpResponse {
     info!(
-        "[{}] Current widgets openned: {:?}",
+        "[{}] Current opened widgets: {:?}",
         "Daemon".green().bold(),
         widgets
     );
@@ -76,7 +76,7 @@ fn close_widget_rpc(
     data: Json<RpcDataRequest>,
 ) -> HttpResponse {
     info!(
-        "[{}] Current widgets openned: {:?}",
+        "[{}] Current opened widgets: {:?}",
         "Daemon".green().bold(),
         widgets
     );
@@ -97,7 +97,7 @@ fn toggle_widget_rpc(
     data: Json<RpcDataRequest>,
 ) -> HttpResponse {
     info!(
-        "[{}] Current widgets openned: {:?}",
+        "[{}] Current opened widgets: {:?}",
         "Daemon".green().bold(),
         widgets
     );

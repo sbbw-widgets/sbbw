@@ -20,7 +20,7 @@ fn validate_config_from_string(config: &str) -> Result<WidgetConfig, String> {
     match toml::from_str::<'_, WidgetConfig>(config) {
         Ok(conf) => Ok(conf),
         Err(e) => Err(format!(
-            "[{}] Config file is not valid: {}",
+            "[{}] Invalid config file: {}",
             "Error".red().bold(),
             e
         )),
@@ -38,7 +38,7 @@ pub fn exits_widget(widget_name: String) -> bool {
 pub fn validate_config_toml(conf_path: PathBuf) -> Result<WidgetConfig, String> {
     if !conf_path.exists() {
         return Err(format!(
-            "[{}] Config file for window not found: {}",
+            "[{}] window config file not found: {}",
             "Error".red().bold(),
             conf_path.display()
         ));

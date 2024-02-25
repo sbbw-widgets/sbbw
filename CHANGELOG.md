@@ -1,21 +1,27 @@
 ### Features
+
 - Install command (only if hosted in git repository)
 - New daemon comunication
-- Fork process to background
+- background fork process
 - Verbosity level
-- Fix widget log file path
+- Fix the widget's log file path
 - Add internal commands (battery, sysinfo, widget)
-- Create nodejs bridgen to the internal API
+- Create nodeJS bridge to internal APIs
 
 ### Refactor
-- SbbwWidget new structure, more scalable and easy add features
-- New arguments on cli
-- Replace structopts to native clap
+
+- SbbwWidget new folder structure, more scalable and easy to add new features
+- New CLI arguments
+- Replaced structopts with native clap
 
 ### Details
-New commands and migrate old commands and arguments
+
+New commands and migrated old ones and their arguments
+
 ---
+
 Old:
+
 ```sh
 Sbbw Daemon 0.1.2
 Sergio Ribera
@@ -40,6 +46,7 @@ OPTIONS:
 ```
 
 New:
+
 ```sh
 sbbw 0.1.3
 Sergio Ribera
@@ -69,5 +76,6 @@ SUBCOMMANDS:
 ```
 
 ### TODO
+
 - Add event callbacks api
-- implement media controller built-in
+- implement built-in media controller

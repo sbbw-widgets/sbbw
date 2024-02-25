@@ -11,7 +11,7 @@ use super::SbbwBrightnessDevice;
 
 pub fn get_main_brightness(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request brightness_ctl of main");
+    trace!("Requesting main brightness_ctl");
 
     match get_all_devices() {
         Ok(devices) => {
@@ -34,7 +34,7 @@ pub fn get_main_brightness(_win: &Window, _name: String, _params: &str) -> SbbwR
 
 pub fn get_all_brightness(_win: &Window, _name: String, _params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request brightness_ctl of all");
+    trace!("Requesting all the brightness_ctl instances");
 
     match get_all_devices() {
         Ok(devices) => {
@@ -52,7 +52,7 @@ pub fn get_all_brightness(_win: &Window, _name: String, _params: &str) -> SbbwRe
 
 pub fn set_main_brightness(_win: &Window, _name: String, params: &str) -> SbbwResponse {
     let mut res = SbbwResponse::default();
-    trace!("Request change brightness_ctl of main");
+    trace!("Requesting main brightness_ctl for setting brightness");
 
     match serde_json::from_str::<u32>(params) {
         Ok(value) => {
@@ -73,7 +73,7 @@ pub fn set_main_brightness(_win: &Window, _name: String, params: &str) -> SbbwRe
         Err(_) => {
             error!("Bad params");
             res.status = StatusCode::BAD_REQUEST.as_u16();
-            res.data = "This require percent of brightness to set".to_string();
+            res.data = "This requires the brightness percent to be set".to_string();
         }
     }
 
@@ -81,8 +81,8 @@ pub fn set_main_brightness(_win: &Window, _name: String, params: &str) -> SbbwRe
 }
 
 pub fn set_all_brightness(_win: &Window, _name: String, params: &str) -> SbbwResponse {
-    let mut res = SbbwResponse::default();
-    trace!("Request change brightness_ctl of all");
+    let mut res: SbbwResponse = SbbwResponse::default();
+    trace!("Requesting for all brightness_ctl instances fto set brightness");
 
     match serde_json::from_str::<u32>(params) {
         Ok(value) => {
@@ -100,7 +100,7 @@ pub fn set_all_brightness(_win: &Window, _name: String, params: &str) -> SbbwRes
         Err(_) => {
             error!("Bad params");
             res.status = StatusCode::BAD_REQUEST.as_u16();
-            res.data = "This require percent of brightness to set".to_string();
+            res.data = "This requires the brightness percent to be set".to_string();
         }
     }
 
