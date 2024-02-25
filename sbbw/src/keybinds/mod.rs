@@ -48,5 +48,5 @@ fn add_shortcut(conf: &mut SbbwConfig, shortcut: KeyboardShortcuts) {
         println!("\n\t{}", "Cannot update your configuration".red());
         std::process::exit(1);
     }
-    println!("\n\t{}", "Succes add the shortcut".green());
+    println!("\n\t{}", "Shortcut added successfully".green());
 }

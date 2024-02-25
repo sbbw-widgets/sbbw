@@ -26,7 +26,7 @@ where
                 answer = String::from_utf8(buf[..c - 1].to_vec()).unwrap();
                 is_valid = validation(answer.trim());
             } else {
-                println!("\t{}", "You need write something".magenta());
+                println!("\t{}", "Please write something".magenta());
             }
         } else {
             println!("\tAn error ocurred");
@@ -80,13 +80,13 @@ pub fn get_keys(conf: &SbbwConfig) -> Vec<String> {
 
 pub fn get_shortcut_interactive(conf: &SbbwConfig) -> KeyboardShortcuts {
     let (names, _): (Vec<String>, Vec<WidgetConfig>) = get_widgets().into_iter().unzip();
-    println!("{}\n", "Starting to get shortcuts".cyan());
+    println!("{}\n", "Start receiving shortcuts".cyan());
     let action =
         ask::<RpcAction>("Action to be taken [open|close|toggle|test]", is_rpc_action).unwrap();
     let keys = get_keys(conf);
-    let name = ask::<String>("Which widget do we call?", |a| is_widget(a, &names)).unwrap();
+    let name = ask::<String>("Which widget should sbbw call?", |a| is_widget(a, &names)).unwrap();
     let url: Option<String> = ask::<String>(
-        "You have your own url (perfect for testing, this is optional, you can leave it empty)",
+        "Do you have your own url? (perfect for testing, optional field so you can leave it empty)",
         |_| true,
     )
     .ok();

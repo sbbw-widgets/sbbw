@@ -58,7 +58,7 @@ fn main() {
         Err(e) => {
             println!(
                 "{} reason: {:?}",
-                "Binary for launch Widgets not found".red().bold(),
+                "sbbw-widget binary not found, cannot launch widgets".red().bold(),
                 e
             );
         }
@@ -77,7 +77,7 @@ fn main() {
             Err(_) => {
                 println!("Generating default config file");
                 let cfg = SbbwConfig::default();
-                generate_config_sbbw(cfg.clone()).expect("Failed generating config File");
+                generate_config_sbbw(cfg.clone()).expect("Failed while generating default config file");
                 Some(cfg)
             }
         };
@@ -88,7 +88,7 @@ fn main() {
                     let s = System::new_all();
                     let processes = s.processes_by_exact_name("sbbw");
                     if processes.count() > 1 {
-                        println!("{}", "Other Sbbw Daemon is running".red().bold());
+                        println!("{}", "Another instance of Sbbw Daemon is running".red().bold());
                         std::process::exit(1);
                     }
                 }
@@ -129,7 +129,7 @@ fn main() {
                         Ok(_) => {
                             println!(
                                 "{}",
-                                "Config of widget {} is valid"
+                                "{} widget configuration is valid"
                                     .green()
                                     .replace("{}", &widget_name.yellow().bold())
                             );
@@ -138,7 +138,7 @@ fn main() {
                             error!("Error on check config {e}");
                             println!(
                                 "{}",
-                                "Config of widget {} is not valid"
+                                "Invalid widget configuration for {} "
                                     .red()
                                     .replace("{}", &widget_name.yellow().bold())
                             );
@@ -157,7 +157,7 @@ fn main() {
                     service: service.to_owned(),
                 }) {
                     Err(e) => println!("{e}"),
-                    Ok(_) => println!("Success Widget installed"),
+                    Ok(_) => println!("Widget installed successfully"),
                 }
             }
             WidgetCommands::Shortcuts { action } => process_arg(conf.as_mut().unwrap(), action),
@@ -171,16 +171,16 @@ fn main() {
                     match actix_rt::System::new().block_on(post) {
                         Ok(res) => {
                             if !res.status().is_success() {
-                                println!("Cannot comunicate with daemon");
+                                println!("Cannot communicate with the daemon");
                             } else {
                                 std::process::exit(1);
                             }
                         }
-                        Err(e) => println!("Error calling daemon: {}", e),
+                        Err(e) => println!("Error while calling the daemon: {}", e),
                     }
                 }
                 Err(e) => {
-                    error!("Failed map request: {e}")
+                    error!("Failed to map request: {e}")
                 }
             },
         };

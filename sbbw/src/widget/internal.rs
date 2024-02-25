@@ -41,7 +41,7 @@ fn loop_listen_keybinds(cfg: SbbwConfig) {
         })
         .collect::<Vec<(String, RpcAction, Option<String>, String, Vec<Keycode>)>>();
 
-    trace!("Starting listen keybinds");
+    trace!("Starting keybind listening");
     loop {
         let keys = device_state.get_keys();
         if keys.is_empty() {
@@ -92,8 +92,8 @@ pub fn open_widget(
 ) -> Result<(), String> {
     let (name, _) = widget_data;
     if widgets.contains_key(name) {
-        warn!("[{}] Widget alredy opened", "Daemon".green().bold());
-        return Err(format!("Widget {} already opened", name));
+        warn!("[{}] Widget is already open", "Daemon".green().bold());
+        return Err(format!("Widget {} is already up", name));
     }
     trace!("[{}] Open: {:?}", "Daemon".green().bold(), name);
     let file = OpenOptions::new()
@@ -122,7 +122,7 @@ pub fn open_widget(
     {
         Ok(subprocess) => {
             trace!(
-                "[{}] Widget \"{:?}\" added to opens",
+                "[{}] Widget \"{:?}\" is now up and has been added to the open widgets list",
                 "Daemon".green().bold(),
                 name
             );
@@ -138,15 +138,15 @@ pub fn close_widget(
     widget_data: &(String, Option<WidgetConfig>),
 ) -> Result<(), String> {
     if !widgets.contains_key(&widget_data.0) {
-        log::error!("[{}] Widget not before open", "Daemon".green().bold());
-        return Err("Widget not before open".to_string());
+        log::error!("The widget [{}] hasn't been started", "Daemon".green().bold());
+        return Err("Widget hasn't been started".to_string());
     }
     trace!("[{}] Close: {:?}", "Daemon".green().bold(), widget_data.0);
     if let Some(mut subprocess) = widgets.remove(&widget_data.0) {
         subprocess.kill().unwrap();
         drop(subprocess);
         trace!(
-            "[{}] Widget process \"{:?}\" droped",
+            "[{}] Widget process \"{:?}\" has been dropped",
             "Daemon".green().bold(),
             widget_data.0
         );
@@ -162,15 +162,15 @@ pub fn toggle_widget(
     url: Option<String>,
 ) -> Result<(), String> {
     trace!(
-        "[{}] Toggle widget \"{:?}\"",
+        "[{}] Toggling widget \"{:?}\"",
         "Daemon".green().bold(),
         widget_data.0
     );
     if !widgets.contains_key(&widget_data.0) {
-        trace!("[{}] Toggle widget (Open) ", "Daemon".green().bold());
+        trace!("[{}] Toggling widget (Open) ", "Daemon".green().bold());
         open_widget(widgets, widget_data, action, widget_params, url)
     } else {
-        trace!("[{}] Toggle widget (Close)", "Daemon".green().bold());
+        trace!("[{}] Toggling widget (Closed)", "Daemon".green().bold());
         close_widget(widgets, widget_data)
     }
 }

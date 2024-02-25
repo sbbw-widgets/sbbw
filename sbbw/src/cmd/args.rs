@@ -26,10 +26,10 @@ pub struct ArgOpt {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum WidgetCommands {
-    #[clap(help = "This run widget server and all features")]
+    #[clap(help = "This runs the widget server and all the features")]
     Run,
     Install {
-        #[clap(help = "Repository origin, ex: User/RepoName")]
+        #[clap(help = "Repo origin, ex: User/RepoName")]
         repo: String,
         #[clap(validator = validate_name_install)]
         new_name: Option<String>,
@@ -73,13 +73,13 @@ pub enum ShortcutsAction {
     List,
     Interactive,
     Add {
-        #[clap(help = "Action to trigger when keys has pressed")]
+        #[clap(help = "Action to trigger when key is pressed")]
         action: RpcAction,
         #[clap(help = "Widget to call")]
         widget: String,
-        #[clap(long, short, help = "Arguments for send to trigger")]
+        #[clap(long, short, help = "Arguments for sending to trigger")]
         widget_args: Option<String>,
-        #[clap(help = "Keys to link action")]
+        #[clap(help = "Key to link to action")]
         keys: Vec<String>,
     },
 }
@@ -107,7 +107,7 @@ fn validate_widgets(src: &str) -> Result<(), String> {
         Ok(())
     } else {
         Err(format!(
-            "The value not in widgets installed {:?}",
+            "The value is not in the installed widgets {:?}",
             widgets.join(", ")
         ))
     }
@@ -115,7 +115,7 @@ fn validate_widgets(src: &str) -> Result<(), String> {
 
 fn validate_name_install(src: &str) -> Result<(), String> {
     match validate_widgets(src) {
-        Ok(_) => Err("The widget alredy exists".to_string()),
+        Ok(_) => Err("This widget already exists".to_string()),
         Err(_) => Ok(()),
     }
 }
@@ -159,6 +159,6 @@ pub fn to_request(widget_cmd: &WidgetCommands, url: String) -> Result<RpcDataReq
             widget_params: params.clone(),
             action: sbbw_widget_conf::RpcAction::Test,
         }),
-        _ => Err("No valid Widget Command".to_string()),
+        _ => Err("No valid widget command".to_string()),
     }
 }
